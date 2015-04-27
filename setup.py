@@ -1,6 +1,6 @@
 from setuptools import setup
 
-setup(name='tinyerrands',
+setup(name='tinyErrands',
       version='1.0',
       description='OpenShift App',
       author='Your Name',
