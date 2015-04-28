@@ -14,7 +14,7 @@ from tinyErrands import app as application
 # line, it's possible required libraries won't be in your searchable path
 #
 
-from tinyErrands import *
+from tinyErrandsModel import *
 db.create_all()
 
 #
