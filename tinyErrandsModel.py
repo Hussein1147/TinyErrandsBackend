@@ -12,10 +12,9 @@ class User(db.Model):
 class Card(db.Model):
     __tablename__ = 'card'
     id = db.Column(db.Integer,primary_key=True)
-    CardNumber = db.Column(db.Integer)
+    CardNumber = db.Column(db.BigInteger)
     expMonth = db.Column(db.Integer)
     expYear = db.Column(db.Integer)
     cvc = db.Column(db.Integer)
     User_id = db.Column(db.Integer,db.ForeignKey('user.id'))
     user = db.relationship(User)
-    
