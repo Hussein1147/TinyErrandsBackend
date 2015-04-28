@@ -12,7 +12,7 @@ class User(db.Model):
 class Card(db.Model):
     __tablename__ = 'card'
     id = db.Column(db.Integer,primary_key=True)
-    CardNumber = db.Column(db.BigInteger)
+    CardNumber = db.Column(db.String(250))
     expMonth = db.Column(db.Integer)
     expYear = db.Column(db.Integer)
     cvc = db.Column(db.Integer)
