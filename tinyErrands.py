@@ -5,14 +5,21 @@ import unicodedata
 from flask import Flask,request,json,Response,jsonify
 # from parse_rest.connection import register, ParseBatcher
 # from parse_rest.datatypes import Object as ParseObject
-# from parse_rest.user import User
+# from parse_rest.user import Userpytho
 from sqlalchemy import create_engine,update
 from sqlalchemy.orm import sessionmaker
 from tinyErrandsModel import User,Card
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import create_engine,orm
+Base = declarative_base()
 app = Flask(__name__)
-app.config.from_pyfile('tinyErrands.cfg')
-db = SQLAlchemy(app) 
+engine = create_engine('mysql://admingDa8K2f:Xq4CV8_Br5jU@127.6.142.132:3306')
+
+s = sessionmaker()
+s.configure(bind=engine)
+Base.metadata.create_all(engine)
+session = s()
 @app.route('/')
 @app.route('/createUser',methods=['Post'])
 
@@ -27,13 +34,13 @@ def createUser():
     
     #create and add User
     new_person =User(name=userName,email=userEmail)
-    db.session.add(new_person)
-    db.session.commit()
+    session.add(new_person)
+    session.commit()
     #create and add User Card
     new_person_card = Card(CardNumber=userCardNumber,expMonth=userExpMonth,expYear=userExpYear,cvc=userCvc,user =new_person)
     
-    db.session.add(new_person_card)
-    db.session.commit()
+    session.add(new_person_card)
+    session.commit()
     return Response(json.dumps("Success, Created!"))
     
 @app.route('/hello')

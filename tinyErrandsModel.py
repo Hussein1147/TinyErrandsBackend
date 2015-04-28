@@ -1,20 +1,30 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-app = Flask(__name__)
-app.config.from_pyfile('tinyErrands.cfg')
-db = SQLAlchemy(app) 
-class User(db.Model):
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column,ForeignKey,Integer,BigInter,String
+from sqlalchemy.orm import relationship,sessionmaker,mapper
+from sqlalchemy import create_engine,orm
+
+
+
+Base = declarative_base()
+class User(Base):
     __tablename__ = 'user'
 
-    id = db.Column(db.Integer, primary_key =True)
-    name =db.Column(db.String(250),nullable= False)
-    email = db.Column(db.String(250))
-class Card(db.Model):
+    id = Column(Integer, primary_key =True)
+    name =Column(String(250),nullable= False)
+    email = Column(String(250))
+class Card(Base):
     __tablename__ = 'card'
-    id = db.Column(db.Integer,primary_key=True)
-    CardNumber = db.Column(db.String(250))
-    expMonth = db.Column(db.Integer)
-    expYear = db.Column(db.Integer)
-    cvc = db.Column(db.Integer)
-    User_id = db.Column(db.Integer,db.ForeignKey('user.id'))
-    user = db.relationship(User)
+    id = Column(Integer,primary_key=True)
+    CardNumber = Column(BigInter(250))
+    expMonth = Column(Integer)
+    expYear = Column(Integer)
+    cvc = Column(Integer)
+    User_id = Column(Integer,ForeignKey('user.id'))
+    user = relationship(User)
+    
+engine = create_engine('mysql://admingDa8K2f:Xq4CV8_Br5jU@127.6.142.132:3306')
+
+
+Base.metadata.create_all(engine)
