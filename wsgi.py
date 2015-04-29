@@ -13,10 +13,13 @@ from tinyErrands import app as application
 # IMPORTANT: Put any additional includes below this line.  If placed above this
 # line, it's possible required libraries won't be in your searchable path
 #
-
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import create_engine,update
 from tinyErrandsModel import *
-db.create_all()
-
+Base = declarative_base()
+engine = create_engine('mysql://admingDa8K2f:Xq4CV8_Br5jU@127.6.142.132:3306')
+engine.execute("USE tinyerrands")
+Base.metadata.create_all(engine)
 #
 # Below for testing only
 #
