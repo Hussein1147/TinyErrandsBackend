@@ -13,7 +13,7 @@ from sqlalchemy import create_engine,orm
 Base = declarative_base()
 app = Flask(__name__)
 engine = create_engine('mysql://admingDa8K2f:Xq4CV8_Br5jU@127.6.142.132:3306')
-engine.execute("USE tinyErrands")
+engine.execute("USE tinyerrands")
 s = sessionmaker()
 s.configure(bind=engine)
 Base.metadata.create_all(engine)
