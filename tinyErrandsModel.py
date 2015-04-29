@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column,ForeignKey,Integer,BigInter,String
+from sqlalchemy import Column,ForeignKey,Integer,BigInteger,String
 from sqlalchemy.orm import relationship,sessionmaker,mapper
 from sqlalchemy import create_engine,orm
 
@@ -17,7 +17,7 @@ class User(Base):
 class Card(Base):
     __tablename__ = 'card'
     id = Column(Integer,primary_key=True)
-    CardNumber = Column(BigInter(250))
+    CardNumber = Column(BigInteger)
     expMonth = Column(Integer)
     expYear = Column(Integer)
     cvc = Column(Integer)
