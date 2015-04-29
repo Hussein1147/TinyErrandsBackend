@@ -3,9 +3,7 @@ import sys,os
 import stripe
 import unicodedata
 from flask import Flask,request,json,Response,jsonify
-# from parse_rest.connection import register, ParseBatcher
-# from parse_rest.datatypes import Object as ParseObject
-# from parse_rest.user import Userpytho
+
 from sqlalchemy import create_engine,update
 from sqlalchemy.orm import sessionmaker
 from tinyErrandsModel import User,Card
@@ -42,6 +40,95 @@ def createUser():
     session.add(new_person_card)
     session.commit()
     return Response(json.dumps("Success, Created!"))
+    
+@app.route('/chargeCard',methods=["POST"])
+#here the user card is charged 
+def payments_test():
+    # register(APPLICATION_ID,REST_API_KEY)
+    data = request.get_json(force=True)
+    stripeCurrency =unicodedata.normalize('NFKD', data['stripeCurrency']).encode('ascii','ignore')
+    stripeAmount =unicodedata.normalize('NFKD', data['stripeAmount']).encode('ascii','ignore')
+    stripeDescription=unicodedata.normalize('NFKD', data['stripeDescription']).encode('ascii','ignore')
+    currentUserEmail = unicodedata.normalize('NFKD', data['currentUserEmail']).encode('ascii','ignore')
+    currentUser_obj = session.query(User).filter(User.email == currentUserEmail).one()
+    currentUserCard_obj = session.query(Card).filter(Card.user ==currentUser_obj).one()
+    try:
+        token = stripe.Token.create(
+            card={
+                "number":currentUserCard_obj.CardNumber,
+                "exp_month":currentUserCard_obj.expMonth,
+                "exp_year": currentUserCard_obj.expYear,
+                "cvc": currentUserCard_obj.cvc
+                },
+                )
+        charged = stripe.Charge.create(
+            description=stripeDescription,
+            amount = stripeAmount,
+            currency = stripeCurrency,
+            source= token.id
+            )
+        return Response(json.dumps(charged))
+    except stripe.error.CardError, e:
+        print 'error'
+        return Response(json.dumps(e))
+    
+    
+    except stripe.error.InvalidRequestError, e:
+        body = e.json_body
+        err  = body['error']
+        return Response(json.dumps(err))
+        
+    
+@app.route('/transfer', methods=["POST"])
+
+def transfer():
+    # register(APPLICATION_ID,REST_API_KEY)
+    data = request.get_json(force=True)
+    
+    currentUserEmail= unicodedata.normalize('NFKD', data['currentUserEmail']).encode('ascii','ignore')
+    recipientEmail =unicodedata.normalize('NFKD', data['recipientEmail']).encode('ascii','ignore')
+    amount =unicodedata.normalize('NFKD', data['amount']).encode('ascii','ignore')
+    currentUser_obj = session.query(User).filter(User.email == currentUserEmail).one()
+    currentUserCard_obj = session.query(Card).filter(Card.user ==currentUser_obj).one()
+    recipient_obj = session.query(User).filter(User.email == recipientEmail).one()
+    recipientCard_obj = session.query(Card).filter(Card.user ==recipient_obj).one()
+    print recipient_obj.name
+
+    try:
+        token = stripe.Token.create(
+            card={
+                "number":recipientCard_obj.CardNumber,
+                "exp_month":recipientCard_obj.expMonth,
+                "exp_year": recipientCard_obj.expYear,
+                "cvc": recipientCard_obj.cvc
+                },
+                )
+        
+        recipient = stripe.Recipient.create(
+            name =recipient_obj.name,
+            type ="individual",
+            email=recipientEmail,
+            card = token.id
+            )
+
+        transfer= stripe.Transfer.create(
+        amount=amount,
+        currency="usd",
+        recipient = recipient.id,
+        )
+        return Response(json.dumps(transfer))
+
+    except stripe.error.CardError, e:
+        body = e.json_body
+        err  = body['error']
+        return Response(json.dumps(err))
+    except stripe.error.InvalidRequestError, e:
+         body = e.json_body
+         err  = body['error']
+         return Response(json.dumps(err))
+  
+
+    
     
 @app.route('/hello')
 def index():
