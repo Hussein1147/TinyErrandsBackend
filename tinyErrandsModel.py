@@ -26,5 +26,5 @@ class Card(Base):
     
 engine = create_engine('mysql://admingDa8K2f:Xq4CV8_Br5jU@127.6.142.132:3306')
 
-
+engine.execute("USE tinyErrands")
 Base.metadata.create_all(engine)
