@@ -12,6 +12,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine,orm
 Base = declarative_base()
 app = Flask(__name__)
+app.config['PROPAGATE_EXCEPTIONS'] =True
+stripe.api_key = 'sk_test_OM2dp9YnI2w5eNuUKtrxd56g'
 engine = create_engine('mysql://admingDa8K2f:Xq4CV8_Br5jU@127.6.142.132:3306')
 engine.execute("USE tinyerrands")
 s = sessionmaker()
