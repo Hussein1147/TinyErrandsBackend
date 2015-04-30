@@ -3,19 +3,19 @@ import sys,os
 import stripe
 import unicodedata
 from flask import Flask,request,json,Response,jsonify
-
 from sqlalchemy import create_engine,update
 from sqlalchemy.orm import sessionmaker
 from tinyErrandsModel import User,Card
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine,orm
+
 Base = declarative_base()
 app = Flask(__name__)
 app.config['PROPAGATE_EXCEPTIONS'] =True
 stripe.api_key = 'sk_test_OM2dp9YnI2w5eNuUKtrxd56g'
-engine = create_engine('mysql://admingDa8K2f:Xq4CV8_Br5jU@127.6.142.132:3306')
-engine.execute("USE tinyerrands")
+engine = create_engine('mysql://admingDa8K2f:Xq4CV8_Br5jU@127.6.142.132:3306/tinyerrands')
+
 s = sessionmaker()
 s.configure(bind=engine)
 Base.metadata.create_all(engine)
