@@ -8,7 +8,8 @@ from sqlalchemy.orm import sessionmaker
 from tinyErrandsModel import User,Card
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import create_engine,orm
+from sqlalchemy import create_engine,orm,exc
+from werkzeug import generate_password_hash, check_password_hash
 
 Base = declarative_base()
 app = Flask(__name__)
@@ -20,28 +21,51 @@ s = sessionmaker()
 s.configure(bind=engine)
 Base.metadata.create_all(engine)
 session = s()
+def validate_user(pwdhash,password):
+        if check_password_hash(pwdhash,password):
+            return True
+        else:
+            return False
+def get_user_by_email(value):
+    try:
+        user = session.query(User).filter(User.email == value).first()
+        return user
+    except exc.NoResultFound:
+        return None
+def get_user_by_id(value):
+    try:
+        user = session.query(User).filter(User.id == int(value)).first()
+        return user
+    except exc.NoResultFound:
+        return None      
+
 @app.route('/')
 @app.route('/createUser',methods=['Post'])
 
 def createUser():
     data = request.get_json(force=True)
     userName = unicodedata.normalize('NFKD', data['userName']).encode('ascii','ignore')
+    userPassword = unicodedata.normalize('NFKD', data['userPassword']).encode('ascii','ignore')
     userEmail=unicodedata.normalize('NFKD', data['userEmail']).encode('ascii','ignore')
     userCardNumber=unicodedata.normalize('NFKD', data['userCardNumber']).encode('ascii','ignore')
     userExpMonth=unicodedata.normalize('NFKD', data['userExpMonth']).encode('ascii','ignore')
     userExpYear=unicodedata.normalize('NFKD', data['userExpYear']).encode('ascii','ignore')
     userCvc=unicodedata.normalize('NFKD', data['userCvc']).encode('ascii','ignore')
-    
-    #create and add User
-    new_person =User(name=userName,email=userEmail)
-    session.add(new_person)
-    session.commit()
+    try:
+        new_person =User(name=userName,email=userEmail,password=userPassword)
+        session.add(new_person)
+        session.commit()
     #create and add User Card
-    new_person_card = Card(CardNumber=userCardNumber,expMonth=userExpMonth,expYear=userExpYear,cvc=userCvc,user =new_person)
+        new_person_card = Card(CardNumber=userCardNumber,expMonth=userExpMonth,expYear=userExpYear,cvc=userCvc,user =new_person)
     
-    session.add(new_person_card)
-    session.commit()
-    return Response(json.dumps("Success, Created!"))
+        session.add(new_person_card)
+        session.commit()
+        return Response(json.dumps("Success, Created!"))
+    except exc.InvalidRequestError, e:
+        session.rollback()
+        body = e.json_body
+        err  = body['error']
+        return Response(json.dumps(err))
     
 @app.route('/chargeCard',methods=["POST"])
 #here the user card is charged 
