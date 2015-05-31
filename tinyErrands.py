@@ -4,7 +4,7 @@ import stripe
 import unicodedata
 from flask import Flask,request,json,Response,jsonify
 from sqlalchemy import create_engine,update
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker,scoped_session
 from tinyErrandsModel import User,Card
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.declarative import declarative_base
@@ -45,6 +45,9 @@ def get_user_by_id(value):
 def createUser():
     data = request.get_json(force=True)
     userName = unicodedata.normalize('NFKD', data['userName']).encode('ascii','ignore')
+    #must validate email and passwords 
+    #
+    ####
     userPassword = unicodedata.normalize('NFKD', data['userPassword']).encode('ascii','ignore')
     userEmail=unicodedata.normalize('NFKD', data['userEmail']).encode('ascii','ignore')
     userCardNumber=unicodedata.normalize('NFKD', data['userCardNumber']).encode('ascii','ignore')
@@ -66,6 +69,26 @@ def createUser():
         body = e.json_body
         err  = body['error']
         return Response(json.dumps(err))
+@app.route('/follow',mothods=['POST'])
+
+def follow_user():
+    data = request.get_json(force=True)
+    currentUserEmail = unicodedata.normalize('NFKD', data['currentUserEmail']).encode('ascii','ignore')
+    userFollowedEmail =unicodedata.normalize('NFKD', data['currentUserEmail']).encode('ascii','ignore')
+    currentUser_obj = get_user_by_email(currentUserEmail)
+    userFollowed_obj = get_user_by_email(userFollowedEmail)
+    u = currentUser_obj.follow_user(userFollowed_obj)
+    session.add(u)
+    session.commit()
+    response = "Now Following" + currentUser_obj.followers.count 
+    return Response(json.dumps(response))
+
+    
+
+
+    
+
+    
     
 @app.route('/chargeCard',methods=["POST"])
 #here the user card is charged 
