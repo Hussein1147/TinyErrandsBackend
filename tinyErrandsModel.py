@@ -22,7 +22,7 @@ class User(Base):
     id = Column(Integer, primary_key =True)
     name =Column(String(250),nullable= False)
     email = Column(String(250), unique =True)
-    pwdhash = Column(String(54))
+    password = Column(String(54))
     posts = relationship('Post', backref='author', lazy='dynamic')
     about_me =Column(String(140))
     last_seen = Column(DateTime)
@@ -31,14 +31,14 @@ class User(Base):
                                primaryjoin=(followers.c.follower_id == id), 
                                secondaryjoin=(followers.c.followed_id == id), 
                                lazy='dynamic')
-    def __init__(self, name, email, password):
+    def __init__(self, name, email, unhashpassword):
         self.name = name.title()
         self.email = email.lower()
-        self.set_password(password)
-    def set_password(self, password):
-        self.pwdhash = generate_password_hash(password)
-    def check_password(self, password):
-       return check_password_hash(self.pwdhash, password)
+        self.set_password(unhashpassword)
+    def set_password(self, unhashpassword):
+        self.password = generate_password_hash(unhashpassword)
+    def check_password(self, unhashpassword):
+       return check_password_hash(self.password,unhashpassword)
        
        
     def follow(self, user):
