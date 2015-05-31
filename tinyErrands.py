@@ -69,7 +69,7 @@ def createUser():
         body = e.json_body
         err  = body['error']
         return Response(json.dumps(err))
-@app.route('/follow',mothods=['POST'])
+@app.route('/follow',methods=['POST'])
 
 def follow_user():
     data = request.get_json(force=True)
