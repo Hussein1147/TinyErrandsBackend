@@ -66,7 +66,7 @@ def createUser():
             source = token,
             description = "New Customer"
             )
-        new_person =User(name=userName,email=userEmail,unhashpassword=userPassword,userCustomerId=customer.id)
+        new_person =User(name=userName,email=userEmail,unhashpassword=userPassword,customer_id=customer.id)
         session.add(new_person)
         session.commit()
         return Response(json.dumps("Success, Created!"))
