@@ -32,10 +32,11 @@ class User(Base):
                                primaryjoin=(followers.c.follower_id == id), 
                                secondaryjoin=(followers.c.followed_id == id), 
                                lazy='dynamic')
-    def __init__(self, name, email, unhashpassword):
+    def __init__(self, name, email, unhashpassword,customer_id):
         self.name = name.title()
         self.email = email.lower()
         self.set_password(unhashpassword)
+        self.customer_id = customer_id
     def set_password(self, unhashpassword):
         self.password = generate_password_hash(unhashpassword)
     def check_password(self, unhashpassword):
