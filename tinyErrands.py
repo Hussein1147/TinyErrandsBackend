@@ -5,7 +5,7 @@ import unicodedata
 from flask import Flask,request,json,Response,jsonify
 from sqlalchemy import create_engine,update
 from sqlalchemy.orm import sessionmaker,scoped_session
-from tinyErrandsModel import User,Card
+from tinyErrandsModel import User
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine,orm,exc
@@ -45,9 +45,6 @@ def get_user_by_id(value):
 def createUser():
     data = request.get_json(force=True)
     userName = unicodedata.normalize('NFKD', data['userName']).encode('ascii','ignore')
-    #must validate email and passwords 
-    #
-    ####
     userPassword = unicodedata.normalize('NFKD', data['userPassword']).encode('ascii','ignore')
     userEmail=unicodedata.normalize('NFKD', data['userEmail']).encode('ascii','ignore')
     userCardNumber=unicodedata.normalize('NFKD', data['userCardNumber']).encode('ascii','ignore')
@@ -55,20 +52,29 @@ def createUser():
     userExpYear=unicodedata.normalize('NFKD', data['userExpYear']).encode('ascii','ignore')
     userCvc=unicodedata.normalize('NFKD', data['userCvc']).encode('ascii','ignore')
     try:
-        new_person =User(name=userName,email=userEmail,unhashpassword=userPassword)
+     ###ONLY FOR TEST MODE
+     ###CHANGE TOKENIZATION TO CLIENT SIDE
+        token = stripe.Token.create(
+        card={
+            "number":userCardNumber,
+            "exp_month":userExpMonth,
+            "exp_year": userExpYear,
+            "cvc": userCvc
+            },
+            )
+        customer = stripe.Customer.create(
+            source = token,
+            description = "New Customer"
+            )
+        new_person =User(name=userName,email=userEmail,unhashpassword=userPassword,userCustomerId=customer.id)
         session.add(new_person)
-        session.commit()
-    #create and add User Card
-        new_person_card = Card(CardNumber=userCardNumber,expMonth=userExpMonth,expYear=userExpYear,cvc=userCvc,user =new_person)
-    
-        session.add(new_person_card)
         session.commit()
         return Response(json.dumps("Success, Created!"))
     except exc.InvalidRequestError, e:
         session.rollback()
         body = e.json_body
         err  = body['error']
-        return Response(json.dumps(err))
+    return Response(json.dumps(err))
 @app.route('/follow',methods=['POST'])
 
 def follow_user():
@@ -100,21 +106,13 @@ def payments_test():
     stripeDescription=unicodedata.normalize('NFKD', data['stripeDescription']).encode('ascii','ignore')
     currentUserEmail = unicodedata.normalize('NFKD', data['currentUserEmail']).encode('ascii','ignore')
     currentUser_obj = session.query(User).filter(User.email == currentUserEmail).one()
-    currentUserCard_obj = session.query(Card).filter(Card.user ==currentUser_obj).one()
+    CID= currentUser_obj.customer_id
     try:
-        token = stripe.Token.create(
-            card={
-                "number":currentUserCard_obj.CardNumber,
-                "exp_month":currentUserCard_obj.expMonth,
-                "exp_year": currentUserCard_obj.expYear,
-                "cvc": currentUserCard_obj.cvc
-                },
-                )
         charged = stripe.Charge.create(
             description=stripeDescription,
             amount = stripeAmount,
             currency = stripeCurrency,
-            source= token.id
+            customer= CID
             )
         return Response(json.dumps(charged))
     except stripe.error.CardError, e:

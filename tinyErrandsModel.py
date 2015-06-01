@@ -23,6 +23,7 @@ class User(Base):
     name =Column(String(250),nullable= False)
     email = Column(String(250), unique =True)
     password = Column(String(54))
+    customer_id =Column(String(250))
     posts = relationship('Post', backref='author', lazy='dynamic')
     about_me =Column(String(140))
     last_seen = Column(DateTime)
@@ -62,16 +63,6 @@ class Post(Base):
     user_id = Column(Integer,ForeignKey('user.id'))
     like_count = Column(Integer, default = 0)
     
-class Card(Base):
-    __tablename__ = 'card'
-    id = Column(Integer,primary_key=True)
-    CardNumber = Column(BigInteger)
-    expMonth = Column(Integer)
-    expYear = Column(Integer)
-    cvc = Column(Integer)
-    User_id = Column(Integer,ForeignKey('user.id'))
-    user = relationship(User)
-
 class UserPostLike(Base):
     __tablename__ = 'likes'
     id = Column(Integer,primary_key=True)

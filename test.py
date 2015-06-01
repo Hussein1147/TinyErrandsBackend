@@ -2,7 +2,7 @@ import os
 import unittest
 from flask import Flask
 # from tinyErrands import app as application
-from tinyErrandsModel import User,Card,Post,Base,followers,UserPostLike
+from tinyErrandsModel import User,Post,Base,followers,UserPostLike
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine,orm
 from sqlalchemy.orm import sessionmaker,scoped_session
@@ -135,9 +135,10 @@ class TestCase(unittest.TestCase):
          self.s.add(p2)
          self.s.commit()
          assert p2.like_count == 3
-    # def truncate(self):
-    #     Base.metadata.drop_all(self.engine)
-    #     Base.metadata.create_all(self.engine)
+         
+    def truncate(self):
+        Base.metadata.drop_all(self.engine)
+        Base.metadata.create_all(self.engine)
 
 
         
