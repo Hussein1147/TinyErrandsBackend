@@ -55,7 +55,7 @@ def createUser():
     userExpYear=unicodedata.normalize('NFKD', data['userExpYear']).encode('ascii','ignore')
     userCvc=unicodedata.normalize('NFKD', data['userCvc']).encode('ascii','ignore')
     try:
-        new_person =User(name=userName,email=userEmail,password=userPassword)
+        new_person =User(name=userName,email=userEmail,unhashpassword=userPassword)
         session.add(new_person)
         session.commit()
     #create and add User Card
