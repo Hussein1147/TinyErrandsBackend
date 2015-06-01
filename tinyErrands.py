@@ -72,8 +72,7 @@ def createUser():
         return Response(json.dumps("Success, Created!"))
     except exc.InvalidRequestError, e:
         session.rollback()
-        # body = e.json_body
-        # err  = body['error']
+        ####FORMAT ERROR
     return Response(json.dumps(e))
 @app.route('/follow',methods=['POST'])
 
@@ -101,29 +100,31 @@ def follow_user():
 def payments_test():
     # register(APPLICATION_ID,REST_API_KEY)
     data = request.get_json(force=True)
-    stripeCurrency =unicodedata.normalize('NFKD', data['stripeCurrency']).encode('ascii','ignore')
-    stripeAmount =unicodedata.normalize('NFKD', data['stripeAmount']).encode('ascii','ignore')
-    stripeDescription=unicodedata.normalize('NFKD', data['stripeDescription']).encode('ascii','ignore')
+    #stripeCurrency =unicodedata.normalize('NFKD', data['stripeCurrency']).encode('ascii','ignore')
+    #stripeAmount =unicodedata.normalize('NFKD', data['stripeAmount']).encode('ascii','ignore')
+    #stripeDescription=unicodedata.normalize('NFKD', data['stripeDescription']).encode('ascii','ignore')
     currentUserEmail = unicodedata.normalize('NFKD', data['currentUserEmail']).encode('ascii','ignore')
     currentUser_obj = session.query(User).filter(User.email == currentUserEmail).one()
     CID= currentUser_obj.customer_id
-    try:
-        charged = stripe.Charge.create(
-            description=stripeDescription,
-            amount = stripeAmount,
-            currency = stripeCurrency,
-            customer= CID
-            )
-        return Response(json.dumps(charged))
-    except stripe.error.CardError, e:
-        print 'error'
-        return Response(json.dumps(e))
+    customer = stripe.Customer.retrieve(CID)
+    print customer
+    # try:
+    #     charged = stripe.Charge.create(
+    #         description=stripeDescription,
+    #         amount = stripeAmount,
+    #         currency = stripeCurrency,
+    #         customer= CID
+    #         )
+    #     return Response(json.dumps(charged))
+    # except stripe.error.CardError, e:
+    #     print 'error'
+    #     return Response(json.dumps(e))
     
     
-    except stripe.error.InvalidRequestError, e:
-        body = e.json_body
-        err  = body['error']
-        return Response(json.dumps(err))
+    # except stripe.error.InvalidRequestError, e:
+    #     body = e.json_body
+    #     err  = body['error']
+    #     return Response(json.dumps(err))
         
     
 @app.route('/transfer', methods=["POST"])
