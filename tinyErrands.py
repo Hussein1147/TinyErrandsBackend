@@ -5,7 +5,7 @@ import unicodedata
 from flask import Flask,request,json,Response,jsonify
 from sqlalchemy import create_engine,update
 from sqlalchemy.orm import sessionmaker,scoped_session
-from tinyErrandsModel import User
+from tinyErrandsModel import User,Card
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine,orm,exc
@@ -45,35 +45,29 @@ def get_user_by_id(value):
 def createUser():
     data = request.get_json(force=True)
     userName = unicodedata.normalize('NFKD', data['userName']).encode('ascii','ignore')
+    #must validate email and passwords 
+    #
+    ####
     userPassword = unicodedata.normalize('NFKD', data['userPassword']).encode('ascii','ignore')
     userEmail=unicodedata.normalize('NFKD', data['userEmail']).encode('ascii','ignore')
     userCardNumber=unicodedata.normalize('NFKD', data['userCardNumber']).encode('ascii','ignore')
     userExpMonth=unicodedata.normalize('NFKD', data['userExpMonth']).encode('ascii','ignore')
     userExpYear=unicodedata.normalize('NFKD', data['userExpYear']).encode('ascii','ignore')
-    userCvc=unicodedata.normalize('NFKD', data['userCvc']).encode('ascii','ignore')
     try:
-     ###ONLY FOR TEST MODE
-     ###CHANGE TOKENIZATION TO CLIENT SIDE
-        token = stripe.Token.create(
-        card={
-            "number":userCardNumber,
-            "exp_month":userExpMonth,
-            "exp_year": userExpYear,
-            "cvc": userCvc
-            },
-            )
-        customer = stripe.Customer.create(
-            source = token,
-            description = "New Customer"
-            )
-        new_person =User(name=userName,email=userEmail,unhashpassword=userPassword,customer_id=customer.id)
+        new_person =User(name=userName,email=userEmail,unhashpassword=userPassword)
         session.add(new_person)
+        session.commit()
+    #create and add User Card
+        new_person_card = Card(CardNumber=userCardNumber,expMonth=userExpMonth,expYear=userExpYear,user=new_person)
+    
+        session.add(new_person_card)
         session.commit()
         return Response(json.dumps("Success, Created!"))
     except exc.InvalidRequestError, e:
         session.rollback()
-        ####FORMAT ERROR
-    return Response(json.dumps(e))
+        body = e.json_body
+        err  = body['error']
+        return Response(json.dumps(err))
 @app.route('/follow',methods=['POST'])
 
 def follow_user():
@@ -100,31 +94,36 @@ def follow_user():
 def payments_test():
     # register(APPLICATION_ID,REST_API_KEY)
     data = request.get_json(force=True)
-    #stripeCurrency =unicodedata.normalize('NFKD', data['stripeCurrency']).encode('ascii','ignore')
-    #stripeAmount =unicodedata.normalize('NFKD', data['stripeAmount']).encode('ascii','ignore')
-    #stripeDescription=unicodedata.normalize('NFKD', data['stripeDescription']).encode('ascii','ignore')
+    stripeCurrency =unicodedata.normalize('NFKD', data['stripeCurrency']).encode('ascii','ignore')
+    stripeAmount =unicodedata.normalize('NFKD', data['stripeAmount']).encode('ascii','ignore')
+    stripeDescription=unicodedata.normalize('NFKD', data['stripeDescription']).encode('ascii','ignore')
     currentUserEmail = unicodedata.normalize('NFKD', data['currentUserEmail']).encode('ascii','ignore')
     currentUser_obj = session.query(User).filter(User.email == currentUserEmail).one()
-    CID= currentUser_obj.customer_id
-    customer = stripe.Customer.retrieve(CID)
-    print customer
-    # try:
-    #     charged = stripe.Charge.create(
-    #         description=stripeDescription,
-    #         amount = stripeAmount,
-    #         currency = stripeCurrency,
-    #         customer= CID
-    #         )
-    #     return Response(json.dumps(charged))
-    # except stripe.error.CardError, e:
-    #     print 'error'
-    #     return Response(json.dumps(e))
+    currentUserCard_obj = session.query(Card).filter(Card.user ==currentUser_obj).one()
+    try:
+        token = stripe.Token.create(
+            card={
+                "number":currentUserCard_obj.CardNumber,
+                "exp_month":currentUserCard_obj.expMonth,
+                "exp_year": currentUserCard_obj.expYear,
+                },
+                )
+        charged = stripe.Charge.create(
+            description=stripeDescription,
+            amount = stripeAmount,
+            currency = stripeCurrency,
+            source= token.id
+            )
+        return Response(json.dumps(charged))
+    except stripe.error.CardError, e:
+        print 'error'
+        return Response(json.dumps(e))
     
     
-    # except stripe.error.InvalidRequestError, e:
-    #     body = e.json_body
-    #     err  = body['error']
-    #     return Response(json.dumps(err))
+    except stripe.error.InvalidRequestError, e:
+        body = e.json_body
+        err  = body['error']
+        return Response(json.dumps(err))
         
     
 @app.route('/transfer', methods=["POST"])
@@ -135,7 +134,7 @@ def transfer():
     
     currentUserEmail= unicodedata.normalize('NFKD', data['currentUserEmail']).encode('ascii','ignore')
     recipientEmail =unicodedata.normalize('NFKD', data['recipientEmail']).encode('ascii','ignore')
-    amount =unicodedata.normalize('NFKD', data['amount']).encode('ascii','ignore')
+    stripeAmount =unicodedata.normalize('NFKD', data['amount']).encode('ascii','ignore')
     currentUser_obj = session.query(User).filter(User.email == currentUserEmail).one()
     currentUserCard_obj = session.query(Card).filter(Card.user ==currentUser_obj).one()
     recipient_obj = session.query(User).filter(User.email == recipientEmail).one()
@@ -148,7 +147,6 @@ def transfer():
                 "number":recipientCard_obj.CardNumber,
                 "exp_month":recipientCard_obj.expMonth,
                 "exp_year": recipientCard_obj.expYear,
-                "cvc": recipientCard_obj.cvc
                 },
                 )
         
@@ -160,7 +158,7 @@ def transfer():
             )
 
         transfer= stripe.Transfer.create(
-        amount=amount,
+        amount=stripeAmount,
         currency="usd",
         recipient = recipient.id,
         )

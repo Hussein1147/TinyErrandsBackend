@@ -32,11 +32,10 @@ class User(Base):
                                primaryjoin=(followers.c.follower_id == id), 
                                secondaryjoin=(followers.c.followed_id == id), 
                                lazy='dynamic')
-    def __init__(self, name, email, unhashpassword,customer_id):
+    def __init__(self, name, email, unhashpassword):
         self.name = name.title()
         self.email = email.lower()
         self.set_password(unhashpassword)
-        self.customer_id = customer_id
     def set_password(self, unhashpassword):
         self.password = generate_password_hash(unhashpassword)
     def check_password(self, unhashpassword):
@@ -64,6 +63,15 @@ class Post(Base):
     user_id = Column(Integer,ForeignKey('user.id'))
     like_count = Column(Integer, default = 0)
     
+class Card(Base):
+    __tablename__ = 'card'
+    id = Column(Integer,primary_key=True)
+    CardNumber = Column(BigInteger)
+    expMonth = Column(Integer)
+    expYear = Column(Integer)
+    User_id = Column(Integer,ForeignKey('user.id'))
+    user = relationship(User)
+
 class UserPostLike(Base):
     __tablename__ = 'likes'
     id = Column(Integer,primary_key=True)
