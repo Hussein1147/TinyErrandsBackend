@@ -22,7 +22,7 @@ class User(Base):
     id = Column(Integer, primary_key =True)
     name =Column(String(250),nullable= False)
     email = Column(String(250), unique =True)
-    password = Column(String(54))
+    password = Column(String(250))
     customer_id =Column(String(250))
     posts = relationship('Post', backref='author', lazy='dynamic')
     about_me =Column(String(140))
@@ -32,10 +32,12 @@ class User(Base):
                                primaryjoin=(followers.c.follower_id == id), 
                                secondaryjoin=(followers.c.followed_id == id), 
                                lazy='dynamic')
-    def __init__(self, name, email, unhashpassword):
+    def __init__(self, name, email, unhashpassword,about_me=None,last_seen=None):
         self.name = name.title()
         self.email = email.lower()
         self.set_password(unhashpassword)
+        self.last_seen=last_seen
+        self.about_me = about_me
     def set_password(self, unhashpassword):
         self.password = generate_password_hash(unhashpassword)
     def check_password(self, unhashpassword):
@@ -95,7 +97,7 @@ class UserPostLike(Base):
 #
 #
 #
-engine = create_engine('mysql://admingDa8K2f:Xq4CV8_Br5jU@127.0.0.1:3306/tinyerrands')
+engine = create_engine('mysql://admingDa8K2f:Xq4CV8_Br5jU@127.6.142.132:3306/tinyerrands')
 s = sessionmaker()
 s.configure(bind=engine)
 Base.metadata.create_all(engine)

@@ -2,11 +2,12 @@ import os
 import unittest
 from flask import Flask
 # from tinyErrands import app as application
-from tinyErrandsModel import User,Post,Base,followers,UserPostLike
+from tinyErrandsModel import User,Card,Post,Base,followers,UserPostLike
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine,orm
 from sqlalchemy.orm import sessionmaker,scoped_session
 from datetime import datetime, timedelta
+import stripe
 application = Flask(__name__)
 
 
@@ -23,6 +24,9 @@ class TestCase(unittest.TestCase):
         self.s = scoped_session(sessionmaker())
         self.s(bind=self.connection)
         Base.metadata.create_all(self.engine)
+        stripe.api_key = 'sk_test_OM2dp9YnI2w5eNuUKtrxd56g'
+
+        
         
     
     def tearDown(self):
@@ -33,14 +37,14 @@ class TestCase(unittest.TestCase):
         
         
     def test_make_unique_email(self):
-        u = User(name='john', email='johnny@example.com')
+        u = User(name='john', email='johnny@example.com',unhashpassword='mysdl')
         self.s.add(u)
         self.s.commit()
         
         
     def test_follow(self):
-        u1 = User(name='john', email='john@example.com')
-        u2 = User(name='susan', email='susan@example.com')
+        u1 = User(name='john', email='john@example.com',unhashpassword='mysql')
+        u2 = User(name='susan', email='susan@example.com',unhashpassword='mysql')
         self.s.add(u1)
         self.s.add(u2)
         self.s.commit()
@@ -51,9 +55,9 @@ class TestCase(unittest.TestCase):
         self.assertIsNone(u1.follow(u2))
         assert u1.is_following(u2)
         assert u1.followed.count() == 1
-        assert u1.followed.first().name == 'susan'
+        assert u1.followed.first().name == 'Susan'
         assert u2.followers.count() == 1
-        assert u2.followers.first().name == 'john'
+        assert u2.followers.first().name == 'John'
         u = u1.unfollow(u2)
         assert u is not None
         self.s.add(u)
@@ -64,10 +68,10 @@ class TestCase(unittest.TestCase):
         
     def test_follow_posts(self):
          
-         u1 = User(name='djibril', email='djibril@example.com')
-         u2 = User(name='ladji', email='ladji@example.com')
-         u3 = User(name='hussein', email='hussein@example.com')
-         u4 = User(name='rohit', email='rohit@example.com')
+         u1 = User(name='djibril', email='djibril@example.com',unhashpassword='mypass')
+         u2 = User(name='ladji', email='ladji@example.com',unhashpassword='mypass')
+         u3 = User(name='hussein', email='hussein@example.com',unhashpassword='mypass')
+         u4 = User(name='rohit', email='rohit@example.com',unhashpassword='mypass')
          self.s.add(u1)
          self.s.add(u2)
          self.s.add(u3)
@@ -109,10 +113,10 @@ class TestCase(unittest.TestCase):
          assert f3 == [p4, p3]
          assert f4 == [p4]
     def liking_Post(self):
-         u1 = User(name='djibril', email='djibril@example.com')
-         u2 = User(name='ladji', email='ladji@example.com')
-         u3 = User(name='hussein', email='hussein@example.com')
-         u4 = User(name='rohit', email='rohit@example.com')
+         u1 = User(name='djibril', email='djibril@example.com', unhashpassword='mypass')
+         u2 = User(name='ladji', email='ladji@example.com',unhashpassword='mypass')
+         u3 = User(name='hussein', email='hussein@example.com',unhashpassword='mypass')
+         u4 = User(name='rohit', email='rohit@example.com',unhashpassword='mypass')
          self.s.add(u1)
          self.s.add(u2)
          self.s.add(u3)
@@ -135,10 +139,63 @@ class TestCase(unittest.TestCase):
          self.s.add(p2)
          self.s.commit()
          assert p2.like_count == 3
+    def test_Card(self):
+         u1 = User(name='djibril Keita', email='djibril@example.com', unhashpassword='mypass')
+         u2 = User(name='ladji Keita', email='ladji@example.com',unhashpassword='mypass')
+         u3 = User(name='hussein Keita', email='hussein@example.com',unhashpassword='mypass')
+         u4 = User(name='rohit Keita', email='rohit@example.com',unhashpassword='mypass')
+         self.s.add(u1)
+         self.s.add(u2)
+         self.s.add(u3)
+         self.s.add(u4)
+         c1 = Card(CardNumber='4000056655665556',expYear='2017',expMonth='12',User_id=u1.id)
+         c2 = Card(CardNumber='4000056655665556',expYear='2018',expMonth='10',User_id=u2.id)
+         self.s.add(c1)
+         self.s.add(c2)
+         self.s.commit()
+         token = stripe.Token.create(
+            card={
+                "number":c1.CardNumber,
+                "exp_month":c1.expMonth,
+                "exp_year": c1.expYear,
+                },
+                )
+        
+         assert token is not None
+         token2 = stripe.Token.create(
+            card={
+                "number":c2.CardNumber,
+                "exp_month":c2.expMonth,
+                "exp_year": c2.expYear,
+                },
+                )
+         assert token2 is not None
+         stripeAmount = 1000
+         charged = stripe.Charge.create(
+            description="test.py",
+            amount = stripeAmount,
+            currency = "usd",
+            source= token.id
+            )
+         assert charged is not None
+         recipient = stripe.Recipient.create(
+            name =u2.name,
+            type ="individual",
+            email=u2.email,
+            card = token2.id
+            )
+
+         transfer= stripe.Transfer.create(
+         amount=stripeAmount,
+         currency="usd",
+         recipient = recipient.id,
+         )
+         assert transfer is not None
          
-    def truncate(self):
-        Base.metadata.drop_all(self.engine)
-        Base.metadata.create_all(self.engine)
+         
+    # def truncate(self):
+    #     Base.metadata.drop_all(self.engine)
+    #     Base.metadata.create_all(self.engine)
 
 
         
