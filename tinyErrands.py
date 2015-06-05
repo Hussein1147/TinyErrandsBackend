@@ -54,6 +54,8 @@ def createUser():
     userExpMonth=unicodedata.normalize('NFKD', data['userExpMonth']).encode('ascii','ignore')
     userExpYear=unicodedata.normalize('NFKD', data['userExpYear']).encode('ascii','ignore')
     try:
+        session.rollback()
+
         if session.query(User).filter(User.email == userEmail).one() is  None: 
             new_person =User(name=userName,email=userEmail,unhashpassword=userPassword)
             session.add(new_person)
@@ -69,12 +71,10 @@ def createUser():
             
     except exc.IntegrityError, e:
         session.rollback()
-        body = e.json_body
-        err  = body['error']
-        return Response(json.dumps(err))
+        return Response(e)
     except exc.InvalidRequestError, e:
         session.rollback()
-        return Response(json.dumps(e))
+        return Response(e)
 @app.route('/follow',methods=['POST'])
 
 def follow_user():
