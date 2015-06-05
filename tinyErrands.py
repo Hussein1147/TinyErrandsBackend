@@ -140,6 +140,8 @@ def transfer():
     currentUserEmail= unicodedata.normalize('NFKD', data['currentUserEmail']).encode('ascii','ignore')
     recipientEmail =unicodedata.normalize('NFKD', data['recipientEmail']).encode('ascii','ignore')
     stripeAmount =unicodedata.normalize('NFKD', data['amount']).encode('ascii','ignore')
+    stripeCurrency =unicodedata.normalize('NFKD', data['stripeCurrency']).encode('ascii','ignore')
+    stripeDescription=unicodedata.normalize('NFKD', data['stripeDescription']).encode('ascii','ignore')
     currentUser_obj = session.query(User).filter(User.email == currentUserEmail).one()
     currentUserCard_obj = session.query(Card).filter(Card.user ==currentUser_obj).one()
     recipient_obj = session.query(User).filter(User.email == recipientEmail).one()
@@ -161,11 +163,25 @@ def transfer():
             email=recipientEmail,
             card = token.id
             )
+        token2 = stripe.Token.create(
+            card={
+                "number":currentUserCard_obj.CardNumber,
+                "exp_month":currentUserCard_obj.expMonth,
+                "exp_year": currentUserCard_obj.expYear,
+                },
+                )
+        charged = stripe.Charge.create(
+            description=stripeDescription,
+            amount = stripeAmount,
+            currency = stripeCurrency,
+            source= token2.id
+            )
 
         transfer= stripe.Transfer.create(
         amount=stripeAmount,
-        currency="usd",
+        currency=stripeCurrency,
         recipient = recipient.id,
+        source_transaction= charged.id
         )
         return Response(json.dumps(transfer))
 
