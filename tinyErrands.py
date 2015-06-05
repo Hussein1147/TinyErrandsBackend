@@ -54,15 +54,24 @@ def createUser():
     userExpMonth=unicodedata.normalize('NFKD', data['userExpMonth']).encode('ascii','ignore')
     userExpYear=unicodedata.normalize('NFKD', data['userExpYear']).encode('ascii','ignore')
     try:
-        new_person =User(name=userName,email=userEmail,unhashpassword=userPassword)
-        session.add(new_person)
-        session.commit()
+        if session.query(User).filter(User.email == userEmail).one() is  None: 
+            new_person =User(name=userName,email=userEmail,unhashpassword=userPassword)
+            session.add(new_person)
+            session.commit()
     #create and add User Card
-        new_person_card = Card(CardNumber=userCardNumber,expMonth=userExpMonth,expYear=userExpYear,user=new_person)
+            new_person_card = Card(CardNumber=userCardNumber,expMonth=userExpMonth,expYear=userExpYear,user=new_person)
     
-        session.add(new_person_card)
-        session.commit()
-        return Response(json.dumps("Success, Created!"))
+            session.add(new_person_card)
+            session.commit()
+            return Response(json.dumps("Success, Created!"))
+        else:
+            return Response(json.dumps("User email is taken!"))
+            
+    except exc.IntegrityError, e:
+        session.rollback()
+        body = e.json_body
+        err  = body['error']
+        return Response(json.dumps(err))
     except exc.InvalidRequestError, e:
         session.rollback()
         body = e.json_body
