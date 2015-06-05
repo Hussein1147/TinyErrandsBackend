@@ -74,9 +74,7 @@ def createUser():
         return Response(json.dumps(err))
     except exc.InvalidRequestError, e:
         session.rollback()
-        body = e.json_body
-        err  = body['error']
-        return Response(json.dumps(err))
+        return Response(json.dumps(e))
 @app.route('/follow',methods=['POST'])
 
 def follow_user():
