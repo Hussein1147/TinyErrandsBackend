@@ -54,9 +54,7 @@ def createUser():
     userExpMonth=unicodedata.normalize('NFKD', data['userExpMonth']).encode('ascii','ignore')
     userExpYear=unicodedata.normalize('NFKD', data['userExpYear']).encode('ascii','ignore')
     try:
-        session.rollback()
-
-        if session.query(User).filter(User.email == userEmail).one() is  None: 
+        if session.query(User).filter(User.email == userEmail).first() is  None: 
             new_person =User(name=userName,email=userEmail,unhashpassword=userPassword)
             session.add(new_person)
             session.commit()
