@@ -170,6 +170,7 @@ def get_followed_post():
         del post.__dict__['_sa_instance_state']
         del post.__dict__['timestamp']
         response.append(post.__dict__)
+        
     return Response(json.dumps(response))
     
     

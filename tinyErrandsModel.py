@@ -58,7 +58,7 @@ class User(Base):
         return self.followed.filter(followers.c.followed_id ==user.id).count() > 0
         
     def followed_posts(self,session):
-        return session.query(Post).join(followers, followers.c.followed_id == Post.user_id).filter(followers.c.follower_id == self.id).order_by(Post.timestamp.desc())
+        return session.query(Post).join(followers, followers.c.followed_id == Post.user_id).filter(followers.c.follower_id == self.id).order_by(Post.timestamp.desc()).all()
 class Post(Base):
     __tablename__='posts'
     id = Column(Integer, primary_key = True)
@@ -105,7 +105,7 @@ class UserPostLike(Base):
 #
 #
 #
-engine = create_engine('mysql://admingDa8K2f:Xq4CV8_Br5jU@127.6.142.132:3306/tinyerrands')
+engine = create_engine('mysql://admingDa8K2f:Xq4CV8_Br5jU@127.0.0.1:3306/tinyerrands')
 s = sessionmaker()
 s.configure(bind=engine)
 Base.metadata.create_all(engine)
