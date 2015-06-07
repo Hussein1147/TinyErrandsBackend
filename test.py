@@ -131,6 +131,7 @@ class TestCase(unittest.TestCase):
          self.s.add(p3)
          self.s.add(p4)
          self.s.commit()
+         print p1.get_postedTime()
          u1like = UserPostLike()
          u1like.like(u1,p2,self.s)
          u1like.like(u2,p2,self.s)
@@ -148,7 +149,7 @@ class TestCase(unittest.TestCase):
          self.s.add(u2)
          self.s.add(u3)
          self.s.add(u4)
-         c1 = Card(CardNumber='4000056655665556',expYear='2017',expMonth='12',User_id=u1.id)
+         c1 = Card(CardNumber='4000000000000077',expYear='2017',expMonth='12',User_id=u1.id)
          c2 = Card(CardNumber='4000056655665556',expYear='2018',expMonth='10',User_id=u2.id)
          self.s.add(c1)
          self.s.add(c2)
@@ -189,8 +190,10 @@ class TestCase(unittest.TestCase):
          amount=stripeAmount,
          currency="usd",
          recipient = recipient.id,
+         source_transaction = charged.id
          )
          assert transfer is not None
+         
          
          
     # def truncate(self):

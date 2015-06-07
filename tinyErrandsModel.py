@@ -23,7 +23,6 @@ class User(Base):
     name =Column(String(250),nullable= False)
     email = Column(String(250), unique =True)
     password = Column(String(250))
-    customer_id =Column(String(250))
     posts = relationship('Post', backref='author', lazy='dynamic')
     about_me =Column(String(140))
     last_seen = Column(DateTime)
@@ -43,16 +42,19 @@ class User(Base):
     def check_password(self, unhashpassword):
        return check_password_hash(self.password,unhashpassword)
        
-       
     def follow(self, user):
         if not self.is_following(user):
             self.followed.append(user)
             return self
+    def get_followers(self,session):
+        return session.query(User.name,User.email).join(followers,followers.c.followed_id == User.id).filter(followers.c.follower_id == self.id).order_by(User.name.asc()).all()
+    
     def unfollow(self,user):
         if self.is_following(user):
             self.followed.remove(user)
             return self
     def is_following(self,user):
+        ## modify
         return self.followed.filter(followers.c.followed_id ==user.id).count() > 0
         
     def followed_posts(self,session):
@@ -62,8 +64,14 @@ class Post(Base):
     id = Column(Integer, primary_key = True)
     body = Column(String(140))
     timestamp = Column(DateTime)
+    postedTime =Column(String(40))
     user_id = Column(Integer,ForeignKey('user.id'))
     like_count = Column(Integer, default = 0)
+    def __init__(self, body,timestamp,author,like_count=None,postedTime=None):
+        self.body=body
+        self.timestamp=timestamp
+        self.author =author
+   
     
 class Card(Base):
     __tablename__ = 'card'
@@ -97,7 +105,7 @@ class UserPostLike(Base):
 #
 #
 #
-engine = create_engine('mysql://admingDa8K2f:Xq4CV8_Br5jU@127.6.142.132:3306/tinyerrands')
+engine = create_engine('mysql://admingDa8K2f:Xq4CV8_Br5jU@127.0.0.1:3306/tinyerrands')
 s = sessionmaker()
 s.configure(bind=engine)
 Base.metadata.create_all(engine)
