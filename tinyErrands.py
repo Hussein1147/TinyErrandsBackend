@@ -166,12 +166,12 @@ def get_followed_post():
     posts = currentUser_obj.followed_posts(session)
     response = []
     for post in posts:
-        
-        post.postedTime = pretty_date(post.timestamp)
-        del post.__dict__['_sa_instance_state']
-        #del post.__dict__['timestamp']
-        response.append(post.__dict__)
-        print post.__dict__
+        print pretty_date(post.timestamp)
+        # post.postedTime = pretty_date(post.timestamp)
+        # del post.__dict__['_sa_instance_state']
+        # #del post.__dict__['timestamp']
+        # response.append(post.__dict__)
+        # print post.__dict__
     return Response("Ok")
     
     
