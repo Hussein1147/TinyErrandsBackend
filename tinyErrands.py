@@ -5,7 +5,7 @@ import unicodedata
 from flask import Flask,request,json,Response,jsonify
 from sqlalchemy import create_engine,update
 from sqlalchemy.orm import sessionmaker,scoped_session
-from tinyErrandsModel import User,Card,Post
+from tinyErrandsModel import User,Card,Post,UserPostLike
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine,orm,exc
@@ -82,6 +82,14 @@ def get_user_by_id(value):
         return user
     except exc.NoResultFound:
         return None      
+def get_post_by_id(value):
+    try:
+        post = session.query(Post).filter(Post.id == value).first()
+        return post
+    except exc, e:
+        print "Some Error Happen durring quering post see exception"
+        print e
+        return None
 @app.route('/')
 @app.route('/createUser',methods=['Post'])
 def createUser():
@@ -236,7 +244,27 @@ def transfer():
          err  = body['error']
          return Response(json.dumps(err))
   
+@app.route('/like_post',methods= ["POST"])
 
+def like_post():
+    data = request.get_json(force=True)
+    currentUserEmail = unicodedata.normalize('NFKD', data['currentUserEmail']).encode('ascii','ignore')
+    postId = unicodedata.normalize('NFKD', data['postId']).encode('ascii','ignore')
+    try:
+        currentUser_obj = get_user_by_email(currentUserEmail)
+        post_obj = get_post_by_id(postId)
+        userPostLike = UserPostLike()
+        userPostLike.like(currentUser_obj,post_obj,session)
+        session.add(userPostLike)
+        session.add(post_obj)
+        session.commit()
+        response = {"id":post_obj.id,"like_count": post_obj.like_count}
+        return Response(json.dumps(response))
+    except exc.InvalidRequestError,e:
+        
+        Response(e)
+        return None   
+    
     
     
 @app.route('/hello')
