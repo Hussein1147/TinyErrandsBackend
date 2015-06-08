@@ -60,7 +60,7 @@ def pretty_date(time=False):
     if day_diff < 7:
         return str(day_diff) + " days ago"
     if day_diff < 31:
-        return str(day_diff / 7) + " weeks ago"
+          return str(day_diff / 7) + " weeks ago"
     if day_diff < 365:
         return str(day_diff / 30) + " months ago"
     return str(day_diff / 365) + " years ago"
@@ -82,7 +82,6 @@ def get_user_by_id(value):
         return user
     except exc.NoResultFound:
         return None      
-
 @app.route('/')
 @app.route('/createUser',methods=['Post'])
 def createUser():
@@ -167,7 +166,8 @@ def get_followed_post():
     posts = currentUser_obj.followed_posts(session)
     response = []
     for post in posts:
-        print post.timestamp
+        print type(post.timestamp)
+        print isinstance(post.timestamp,datetime)        
         # post.postedTime = pretty_date(post.timestamp)
         # del post.__dict__['_sa_instance_state']
         # #del post.__dict__['timestamp']
