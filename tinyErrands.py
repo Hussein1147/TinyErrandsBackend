@@ -64,6 +64,7 @@ def pretty_date(time=False):
     if day_diff < 365:
         return str(day_diff / 30) + " months ago"
     return str(day_diff / 365) + " years ago"
+    
 def validate_user(pwdhash,password):
         if check_password_hash(pwdhash,password):
             return True
@@ -166,7 +167,7 @@ def get_followed_post():
     posts = currentUser_obj.followed_posts(session)
     response = []
     for post in posts:
-        print pretty_date(post.timestamp)
+        print post.timestamp
         # post.postedTime = pretty_date(post.timestamp)
         # del post.__dict__['_sa_instance_state']
         # #del post.__dict__['timestamp']
