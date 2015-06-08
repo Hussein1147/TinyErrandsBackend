@@ -131,7 +131,6 @@ class TestCase(unittest.TestCase):
          self.s.add(p3)
          self.s.add(p4)
          self.s.commit()
-         print p1.get_postedTime()
          u1like = UserPostLike()
          u1like.like(u1,p2,self.s)
          u1like.like(u2,p2,self.s)
@@ -196,9 +195,9 @@ class TestCase(unittest.TestCase):
          
          
          
-    def truncate(self):
-        Base.metadata.drop_all(self.engine)
-        Base.metadata.create_all(self.engine)
+    # def truncate(self):
+    #     Base.metadata.drop_all(self.engine)
+    #     Base.metadata.create_all(self.engine)
 
 
         

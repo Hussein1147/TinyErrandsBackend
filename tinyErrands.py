@@ -253,9 +253,9 @@ def like_post():
     try:
         currentUser_obj = get_user_by_email(currentUserEmail)
         post_obj = get_post_by_id(postId)
-        userPostLike = UserPostLike()
-        userPostLike.like(currentUser_obj,post_obj,session)
-        session.add(userPostLike)
+        userPost = UserPostLike()
+        userPost.like(currentUser_obj,post_obj,session)
+        session.add(userPost)
         session.add(post_obj)
         session.commit()
         response = {"id":post_obj.id,"like_count": post_obj.like_count}
