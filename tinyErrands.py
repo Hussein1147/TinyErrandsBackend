@@ -150,7 +150,7 @@ def add_post():
     data = request.get_json(force=True)
     currentUserEmail = unicodedata.normalize('NFKD', data['currentUserEmail']).encode('ascii','ignore')
     post = unicodedata.normalize('NFKD', data['myPost']).encode('ascii','ignore')
-    utcnow = datetime.utcnow()
+    utcnow = datetime.now()
     currentUser_obj = get_user_by_email(currentUserEmail)
     p1 = Post(body=post, author=currentUser_obj, timestamp=utcnow)
     session.add(p1)
@@ -168,7 +168,7 @@ def get_followed_post():
     for post in posts:
         print type(post.timestamp)
         print isinstance(post.timestamp,datetime)        
-        # post.postedTime = pretty_date(post.timestamp)
+        pretty_date(post.timestamp)
         # del post.__dict__['_sa_instance_state']
         # #del post.__dict__['timestamp']
         # response.append(post.__dict__)
