@@ -144,7 +144,12 @@ def createUser():
     
             # session.add(new_person_card)
             # session.commit()
-            return Response(json.dumps("Success, Created!"))
+            return jsonify(
+            success = True,
+            data = {
+            'msg': 'Success!! created User!',
+             }
+            )        
         else:
             return Response(json.dumps("User email is taken!"))
             
