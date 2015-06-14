@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship,sessionmaker,mapper,backref
 from sqlalchemy.sql import update, insert
 from sqlalchemy import create_engine,orm
 from werkzeug import generate_password_hash, check_password_hash
-
+import warnings
 
 
 Base = declarative_base()
@@ -91,10 +91,9 @@ class UserPostLike(Base):
     def like(self,user,post,session):
         query = session.query(UserPostLike).filter(UserPostLike.user_id == user.id).filter(UserPostLike.post_id == post.id).all()
         if len(query) == 0:
+            ###
+            # THIS IS NOT AN ERROR
             session.execute(UserPostLike.__table__.insert(),{"user_id": user.id, "post_id": post.id})
-            # i = insert(UserPostLike)
-            # i = i.values({"user_id": user.id, "post_id": post.id})
-            # session.execute(i)
             likes = post.like_count
             session.query(Post).filter(Post.id ==post.id).update({"like_count": likes + 1})
            

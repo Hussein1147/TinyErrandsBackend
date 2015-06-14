@@ -91,6 +91,32 @@ def get_post_by_id(value):
         print e
         return None
 @app.route('/')
+@app.route('/add_Card',methods=['Post'])
+def addCard():
+    data = request.get_json(force=True)
+    #must validate email and passwords 
+    #
+    ####
+    userEmail=unicodedata.normalize('NFKD', data['userEmail']).encode('ascii','ignore')
+    userCardNumber=unicodedata.normalize('NFKD', data['userCardNumber']).encode('ascii','ignore')
+    userExpMonth=unicodedata.normalize('NFKD', data['userExpMonth']).encode('ascii','ignore')
+    userExpYear=unicodedata.normalize('NFKD', data['userExpYear']).encode('ascii','ignore')
+    try:
+            person =get_user_by_email(userEmail)
+            #create and add User Card
+            new_card = Card(CardNumber=userCardNumber,expMonth=userExpMonth,expYear=userExpYear,user=person)
+    
+            session.add(new_card)
+            session.commit()
+            return Response(json.dumps("Success, Created!"))
+        
+    except exc.IntegrityError, e:
+        session.rollback()
+        return Response(e)
+    except exc.InvalidRequestError, e:
+        session.rollback()
+        return Response(e)
+        
 @app.route('/createUser',methods=['Post'])
 def createUser():
     data = request.get_json(force=True)
@@ -100,19 +126,19 @@ def createUser():
     ####
     userPassword = unicodedata.normalize('NFKD', data['userPassword']).encode('ascii','ignore')
     userEmail=unicodedata.normalize('NFKD', data['userEmail']).encode('ascii','ignore')
-    userCardNumber=unicodedata.normalize('NFKD', data['userCardNumber']).encode('ascii','ignore')
-    userExpMonth=unicodedata.normalize('NFKD', data['userExpMonth']).encode('ascii','ignore')
-    userExpYear=unicodedata.normalize('NFKD', data['userExpYear']).encode('ascii','ignore')
+    # userCardNumber=unicodedata.normalize('NFKD', data['userCardNumber']).encode('ascii','ignore')
+    # userExpMonth=unicodedata.normalize('NFKD', data['userExpMonth']).encode('ascii','ignore')
+    # userExpYear=unicodedata.normalize('NFKD', data['userExpYear']).encode('ascii','ignore')
     try:
         if session.query(User).filter(User.email == userEmail).first() is  None: 
             new_person =User(name=userName,email=userEmail,unhashpassword=userPassword)
             session.add(new_person)
             session.commit()
     #create and add User Card
-            new_person_card = Card(CardNumber=userCardNumber,expMonth=userExpMonth,expYear=userExpYear,user=new_person)
+            # new_person_card = Card(CardNumber=userCardNumber,expMonth=userExpMonth,expYear=userExpYear,user=new_person)
     
-            session.add(new_person_card)
-            session.commit()
+            # session.add(new_person_card)
+            # session.commit()
             return Response(json.dumps("Success, Created!"))
         else:
             return Response(json.dumps("User email is taken!"))
