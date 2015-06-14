@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask,jsonify
 import sys,os
 import stripe
 import unicodedata
@@ -108,7 +108,12 @@ def addCard():
     
             session.add(new_card)
             session.commit()
-            return Response(json.dumps("Success, Created!"))
+            return jsonify(
+        success = True,
+        data = {
+            'msg': 'Success!! created User!',
+        }
+    )
         
     except exc.IntegrityError, e:
         session.rollback()
