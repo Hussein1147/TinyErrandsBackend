@@ -90,7 +90,22 @@ def get_post_by_id(value):
         print "Some Error Happen durring quering post see exception"
         print e
         return None
-@app.route('/')
+##
+# THIS IS NOT THE FINAL IMPL OF GET_ALL_USERS
+##
+@app.route('/get_All_Users', methods = ["POST"])
+def get_all_users():
+    data = request.get_json(force=True)
+    userEmail=unicodedata.normalize('NFKD', data['userEmail']).encode('ascii','ignore')
+    if get_user_by_email(userEmail) is not None:
+        response = []
+        all_Users = session.query(User.name,User.email).all()
+        for user in all_Users:
+            del user.__dict__["_labels"]
+            response.append(user.__dict__)
+        return jsonify(success=True,data=response)
+    
+
 @app.route('/add_Card',methods=['Post'])
 def addCard():
     data = request.get_json(force=True)
