@@ -202,9 +202,11 @@ def get_followers():
     currentUserEmail = unicodedata.normalize('NFKD', data['currentUserEmail']).encode('ascii','ignore')
     currentUser_obj = get_user_by_email(currentUserEmail)
     followers = currentUser_obj.get_followers(session)
-    return Response(json.dumps(followers))
+    
+    return jsonify(success=True,data=followers)
 
     
+
 @app.route('/add_post',methods =['POST'])
 def add_post():
     data = request.get_json(force=True)
