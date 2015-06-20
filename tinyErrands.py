@@ -189,7 +189,7 @@ def follow_user():
         session.add(u)
         session.commit()
         response = "Now Following" +" "+ userFollowed_obj.name
-        return Response(json.dumps(response))
+        return jsonify(success=True, data=response);
     else:
         response = "This user is already being followed"
         return Response(json.dumps(response))
