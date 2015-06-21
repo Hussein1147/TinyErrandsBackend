@@ -105,6 +105,7 @@ def get_all_users():
             response.append(user.__dict__)
         return jsonify(success=True,data=response)
     else:
+        print userEmail
         error="Some error occured"
         return jsonify(success=False,data=error)
     
