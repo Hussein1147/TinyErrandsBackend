@@ -72,9 +72,10 @@ def validate_user(pwdhash,password):
             return False
 def get_user_by_email(value):
     try:
-        user = session.query(User).filter(User.email == value).first()
+        user = session.query(User).filter(User.email == value).one()
         return user
     except exc.NoResultFound:
+        print "No result found"
         return None
 def get_user_by_id(value):
     try:
