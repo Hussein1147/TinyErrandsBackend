@@ -8,7 +8,8 @@ from sqlalchemy.orm import sessionmaker,scoped_session
 from tinyErrandsModel import User,Card,Post,UserPostLike
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import create_engine,orm,exc
+from sqlalchemy import create_engine,orm
+from sqlalchemy.orm.exc import NoResultFound
 from werkzeug import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 
@@ -74,7 +75,7 @@ def get_user_by_email(value):
     try:
         user = session.query(User).filter(User.email == value).one()
         return user
-    except exc.NoResultFound:
+    except NoResultFound:
         print "No result found"
         return None
 def get_user_by_id(value):
