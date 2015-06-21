@@ -104,6 +104,9 @@ def get_all_users():
             del user.__dict__["_labels"]
             response.append(user.__dict__)
         return jsonify(success=True,data=response)
+    else:
+        error="Some error occured"
+        return jsonify(success=False,data=error)
     
 
 @app.route('/add_Card',methods=['Post'])
