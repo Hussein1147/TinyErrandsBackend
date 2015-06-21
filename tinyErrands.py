@@ -9,7 +9,7 @@ from tinyErrandsModel import User,Card,Post,UserPostLike
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine,orm
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import NoResultFound,IntegrityError,InvalidRequestError
 from werkzeug import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 
@@ -136,10 +136,10 @@ def addCard():
         }
     )
         
-    except exc.IntegrityError, e:
+    except IntegrityError, e:
         session.rollback()
         return Response(e)
-    except exc.InvalidRequestError, e:
+    except InvalidRequestError, e:
         session.rollback()
         return Response(e)
         
@@ -156,8 +156,7 @@ def createUser():
     # userExpMonth=unicodedata.normalize('NFKD', data['userExpMonth']).encode('ascii','ignore')
     # userExpYear=unicodedata.normalize('NFKD', data['userExpYear']).encode('ascii','ignore')
     try:
-        session.rollback()
-        if session.query(User).filter(User.email == userEmail).first() is  None: 
+        if session.query(User).filter(User.email == userEmail).one() is  None: 
             new_person =User(name=userName,email=userEmail,unhashpassword=userPassword)
             session.add(new_person)
             session.commit()
@@ -175,10 +174,10 @@ def createUser():
         else:
             return Response(json.dumps("User email is taken!"))
             
-    except exc.IntegrityError, e:
+    except IntegrityError, e:
         session.rollback()
         return Response(e)
-    except exc.InvalidRequestError, e:
+    except InvalidRequestError, e:
         session.rollback()
         return Response(e)
         
