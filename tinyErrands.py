@@ -100,6 +100,7 @@ def get_post_by_id(value):
 def get_all_users():
     data = request.get_json(force=True)
     userEmail=unicodedata.normalize('NFKD', data['userEmail']).encode('ascii','ignore')
+    print userEmail
     if get_user_by_email(userEmail) is not None:
         response = []
         all_Users = session.query(User.name,User.email).all()
@@ -108,7 +109,6 @@ def get_all_users():
             response.append(user.__dict__)
         return jsonify(success=True,data=response)
     else:
-        print userEmail
         error="Some error occured"
         return jsonify(success=False,data=error)
     
@@ -206,7 +206,7 @@ def follow_user():
 def get_followers():
     data = request.get_json(force=True)
     currentUserEmail = unicodedata.normalize('NFKD', data['currentUserEmail']).encode('ascii','ignore')
-    currentUser_obj = get_user_by_email(currentUserEmail)
+    currentUser_obj = session.query(User).filter(User.email == currentUserEmail).one()
     followers = currentUser_obj.get_followers(session)
     
     return jsonify(success=True,data=followers)
