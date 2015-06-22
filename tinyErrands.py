@@ -72,9 +72,9 @@ def validate_user(pwdhash,password):
             return True
         else:
             return False
-def get_user_by_email(value):
+def get_user_by_email(value,new_session):
     try:
-        user = session.query(User).filter(User.email == value).one()
+        user = new_session.query(User).filter(User.email == value).one()
         return user
     except NoResultFound:
         print "No result found"
@@ -100,10 +100,10 @@ def get_post_by_id(value):
 def get_all_users():
     data = request.get_json(force=True)
     userEmail=unicodedata.normalize('NFKD', data['userEmail']).encode('ascii','ignore')
-    print userEmail
-    if get_user_by_email(userEmail) is not None:
+    new_Session=s()
+    if get_user_by_email(userEmail,new_Session) is not None:
         response = []
-        all_Users = session.query(User.name,User.email).all()
+        all_Users = new_Session.query(User.name,User.email).all()
         for user in all_Users:
             del user.__dict__["_labels"]
             response.append(user.__dict__)
@@ -187,13 +187,14 @@ def follow_user():
     data = request.get_json(force=True)
     currentUserEmail = unicodedata.normalize('NFKD', data['currentUserEmail']).encode('ascii','ignore')
     userFollowedEmail =unicodedata.normalize('NFKD', data['userFollowedEmail']).encode('ascii','ignore')
-    currentUser_obj = get_user_by_email(currentUserEmail)
-    userFollowed_obj = get_user_by_email(userFollowedEmail)
+    new_session= s()
+    currentUser_obj = get_user_by_email(currentUserEmail,new_session)
+    userFollowed_obj = get_user_by_email(userFollowedEmail,new_session)
 
     if currentUser_obj.is_following(userFollowed_obj) is not True:
         u = currentUser_obj.follow(userFollowed_obj)
-        session.add(u)
-        session.commit()
+        new_session.add(u)
+        new_session.commit()
         response = "Now Following" +" "+ userFollowed_obj.name
         return jsonify(success=True, data=response);
     else:
@@ -206,8 +207,9 @@ def follow_user():
 def get_followers():
     data = request.get_json(force=True)
     currentUserEmail = unicodedata.normalize('NFKD', data['currentUserEmail']).encode('ascii','ignore')
-    currentUser_obj = session.query(User).filter(User.email == currentUserEmail).one()
-    followers = currentUser_obj.get_followers(session)
+    new_session =s()
+    currentUser_obj = get_user_by_email(currentUserEmail,new_session)
+    followers = currentUser_obj.get_followers(new_session)
     
     return jsonify(success=True,data=followers)
 
