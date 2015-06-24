@@ -85,11 +85,11 @@ def get_user_by_id(value):
         return user
     except exc.NoResultFound:
         return None      
-def get_post_by_id(value):
+def get_post_by_id(value, get_session):
     try:
-        post = session.query(Post).filter(Post.id == value).first()
+        post = get_session.query(Post).filter(Post.id == value).first()
         return post
-    except exc, e:
+    except NoResultFound, e:
         print "Some Error Happen durring quering post see exception"
         print e
         return None
@@ -123,13 +123,14 @@ def addCard():
     userCardNumber=unicodedata.normalize('NFKD', data['userCardNumber']).encode('ascii','ignore')
     userExpMonth=unicodedata.normalize('NFKD', data['userExpMonth']).encode('ascii','ignore')
     userExpYear=unicodedata.normalize('NFKD', data['userExpYear']).encode('ascii','ignore')
-    try:
-            person =get_user_by_email(userEmail)
+    try:    
+            new_Card_Session =s()
+            person =get_user_by_email(userEmail,new_Card_Session)
             #create and add User Card
             new_card = Card(CardNumber=userCardNumber,expMonth=userExpMonth,expYear=userExpYear,user=person)
     
-            session.add(new_card)
-            session.commit()
+            new_Card_Session.add(new_card)
+            new_Card_Session.commit()
             return jsonify(
         success = True,
         data = {
@@ -221,10 +222,11 @@ def add_post():
     currentUserEmail = unicodedata.normalize('NFKD', data['currentUserEmail']).encode('ascii','ignore')
     post = unicodedata.normalize('NFKD', data['myPost']).encode('ascii','ignore')
     utcnow = datetime.now()
-    currentUser_obj = get_user_by_email(currentUserEmail)
+    add_post_session = s()
+    currentUser_obj = get_user_by_email(currentUserEmail,add_post_session)
     p1 = Post(body=post, author=currentUser_obj, timestamp=utcnow)
-    session.add(p1)
-    session.commit()
+    add_post_session.add(p1)
+    add_post_session.commit()
     return Response(json.dumps("Ok"))
 
    
@@ -232,7 +234,8 @@ def add_post():
 def get_followed_post():
     data = request.get_json(force=True)
     currentUserEmail = unicodedata.normalize('NFKD', data['currentUserEmail']).encode('ascii','ignore')
-    currentUser_obj = get_user_by_email(currentUserEmail)
+    get_post_session = s()
+    currentUser_obj = get_user_by_email(currentUserEmail,get_post_session)
     posts = currentUser_obj.followed_posts(session)
     response = []
     for post in posts:
@@ -240,7 +243,7 @@ def get_followed_post():
         del post.__dict__['_sa_instance_state']
         del post.__dict__['timestamp']
         response.append(post.__dict__)
-    return Response(json.dumps(response))
+    return jsonify(success=True, data=response)
     
     
     
@@ -313,7 +316,8 @@ def like_post():
     currentUserEmail = unicodedata.normalize('NFKD', data['currentUserEmail']).encode('ascii','ignore')
     postId = unicodedata.normalize('NFKD', data['postId']).encode('ascii','ignore')
     try:
-        currentUser_obj = get_user_by_email(currentUserEmail)
+        like_post_session=s()
+        currentUser_obj = get_user_by_email(currentUserEmail,like_post_session)
         post_obj = get_post_by_id(postId)
         userPost = UserPostLike()
         userPost.like(currentUser_obj,post_obj,session)
