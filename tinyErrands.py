@@ -236,7 +236,7 @@ def get_followed_post():
     currentUserEmail = unicodedata.normalize('NFKD', data['currentUserEmail']).encode('ascii','ignore')
     get_post_session = s()
     currentUser_obj = get_user_by_email(currentUserEmail,get_post_session)
-    posts = currentUser_obj.followed_posts(session)
+    posts = currentUser_obj.followed_posts(get_post_session)
     response = []
     for post in posts:
         post.postedTime =  pretty_date(post.timestamp)
