@@ -245,6 +245,20 @@ def get_followed_post():
         response.append(post.__dict__)
     return jsonify(success=True, data=response)
     
+@app.route('/get_myposts',methods = ['POST'])
+def get_mypost():
+    data = request.get_json(force=True)
+    currentUserEmail = unicodedata.normalize('NFKD', data['currentUserEmail']).encode('ascii','ignore')
+    get_mypost_session = s()
+    currentUser_obj = get_user_by_email(currentUserEmail,get_mypost_session)
+    posts = currentUser_obj.get_mypost(get_mypost_session)
+    response = []
+    for post in posts:
+        post.postedTime =  pretty_date(post.timestamp)
+        del post.__dict__['_sa_instance_state']
+        del post.__dict__['timestamp']
+        response.append(post.__dict__)
+    return jsonify(success=True, data=response)
     
     
 @app.route('/transfer', methods=["POST"])
