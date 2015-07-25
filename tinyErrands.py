@@ -251,7 +251,7 @@ def get_mypost():
     currentUserEmail = unicodedata.normalize('NFKD', data['currentUserEmail']).encode('ascii','ignore')
     get_mypost_session = s()
     currentUser_obj = get_user_by_email(currentUserEmail,get_mypost_session)
-    posts = currentUser_obj.get_mypost(get_mypost_session)
+    posts = currentUser_obj.get_myposts(get_mypost_session)
     response = []
     for post in posts:
         post.postedTime =  pretty_date(post.timestamp)

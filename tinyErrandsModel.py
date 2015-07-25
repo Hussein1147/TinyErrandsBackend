@@ -56,7 +56,7 @@ class User(Base):
     def is_following(self,user):
         ## modify
         return self.followed.filter(followers.c.followed_id ==user.id).count() > 0
-    def my_post(self,session):
+    def get_myposts(self,session):
         return session.query(Post).filter(Post.user_id == self.id).order_by(Post.timestamp.desc()).all()
         
     def followed_posts(self,session):
