@@ -70,8 +70,8 @@ class Post(Base):
     dueDate = Column(Integer)
     user_id = Column(Integer,ForeignKey('user.id'))
     like_count = Column(Integer, default = 0)
-    def __init__(self, body,timestamp,author,dueDate,like_count=None,postedTime=None):
-        self.body=body
+    def __init__(self, myPost,timestamp,author,dueDate,like_count=None,postedTime=None):
+        self.myPost=myPost
         self.timestamp=timestamp
         self.author =author
         self.dueDate =dueDate
@@ -109,7 +109,7 @@ class UserPostLike(Base):
 #
 #
 #
-engine = create_engine('mysql://admingDa8K2f:Xq4CV8_Br5jU@127.6.142.132:3306/tinyerrands')
+engine = create_engine('mysql://admingDa8K2f:Xq4CV8_Br5jU@127.0.0.1:3306/tinyerrands')
 s = sessionmaker()
 s.configure(bind=engine)
 Base.metadata.create_all(engine)
