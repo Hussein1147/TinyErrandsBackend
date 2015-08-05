@@ -67,12 +67,14 @@ class Post(Base):
     body = Column(String(140))
     timestamp = Column(DateTime)
     postedTime =Column(String(40))
+    dueDate = Column(Integer)
     user_id = Column(Integer,ForeignKey('user.id'))
     like_count = Column(Integer, default = 0)
-    def __init__(self, body,timestamp,author,like_count=None,postedTime=None):
+    def __init__(self, body,timestamp,author,dueDate,like_count=None,postedTime=None):
         self.body=body
         self.timestamp=timestamp
         self.author =author
+        self.dueDate =dueDate
    
     
 class Card(Base):
