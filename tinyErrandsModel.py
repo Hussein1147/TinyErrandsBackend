@@ -64,7 +64,7 @@ class User(Base):
 class Post(Base):
     __tablename__='posts'
     id = Column(Integer, primary_key = True)
-    body = Column(String(140))
+    myPost = Column(String(140))
     timestamp = Column(DateTime)
     postedTime =Column(String(40))
     dueDate = Column(Integer)
@@ -109,7 +109,7 @@ class UserPostLike(Base):
 #
 #
 #
-engine = create_engine('mysql://admingDa8K2f:Xq4CV8_Br5jU@127.6.142.132:3306/tinyerrands')
+engine = create_engine('mysql://admingDa8K2f:Xq4CV8_Br5jU@127.0.0.1:3306/tinyerrands')
 s = sessionmaker()
 s.configure(bind=engine)
 Base.metadata.create_all(engine)

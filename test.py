@@ -195,9 +195,9 @@ class TestCase(unittest.TestCase):
          
          
          
-    # def truncate(self):
-    #     Base.metadata.drop_all(self.engine)
-    #     Base.metadata.create_all(self.engine)
+    def truncate(self):
+        Base.metadata.drop_all(self.engine)
+        Base.metadata.create_all(self.engine)
 
 
         
