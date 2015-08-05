@@ -258,6 +258,7 @@ def get_mypost():
         del post.__dict__['_sa_instance_state']
         del post.__dict__['timestamp']
         response.append(post.__dict__)
+    print response
     return jsonify(success=True, data=response)
     
     
