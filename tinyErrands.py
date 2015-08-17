@@ -67,6 +67,59 @@ def pretty_date(time=False):
         return str(day_diff / 30) + " months ago"
     return str(day_diff / 365) + " years ago"
     
+def pretty_due(start,interval):
+    
+    now = datetime.now()
+    f = (Interval) - (now - start)
+    if f < 60:
+        return 'Due in' + f + 'minutes'
+   
+    elif f == 60:
+        return 'Due in 1 hour'
+    
+    elif 60 <  f < 1440:
+        time = f/float(60)
+        hours = int(time)
+        minutes = int(60 * (time - int(time)))
+        return 'Due in ' + hours + ' hours and ' + minutes + ' minutes'
+    
+    elif f == 1440:
+        return 'Due in 1 day'
+    
+    elif 1440 < f < 1080:
+        time = f/1440
+        days = int(time)
+        hours = int(24 * (time - int(time)))
+        return 'Due in ' + days + ' days and ' + hours + ' hours'
+    
+    elif f == 1080:
+        return 'Due in 1 week'
+    
+    elif  1080 < f < 40320:
+        time = f/1080
+        weeks = int(time)
+        days = int (7 * (time - int(time)))
+        return 'Due in '+ weeks + ' weeks and' + days + ' days'
+    
+    elif f == 40320:
+        return 'Due in 1 month'
+    
+    elif 40320 < f < 483840:
+        time = f/40320
+        months = int(time)
+        weeks = int(4 * (time - int(time)))
+        return 'Due in ' + months + ' months and' + weeks + ' weeks'
+    
+    elif f == 483840:
+        return 'Due in 1 year'
+
+    elif  483820 < f < 2419100:
+        time = f/483820
+        years = int(time)
+        months = int(12 * (time - int(time)))
+        return 'Due in ' + years + ' years and' + months + ' months'
+
+    
 def validate_user(pwdhash,password):
         if check_password_hash(pwdhash,password):
             return True
@@ -222,10 +275,12 @@ def add_post():
     currentUserEmail = unicodedata.normalize('NFKD', data['currentUserEmail']).encode('ascii','ignore')
     post = unicodedata.normalize('NFKD', data['myPost']).encode('ascii','ignore')
     dueIn = unicodedata.normalize('NFKD', data['dueDate']).encode('ascii','ignore')
+    start=  unicodedata.normalize('NFKD', data['startTime']).encode('ascii','ignore')
+    startTime = datetime.strptime(start,"%Y-%m-%dT%H:%M:%S +0000")
     utcnow = datetime.now()
     add_post_session = s()
     currentUser_obj = get_user_by_email(currentUserEmail,add_post_session)
-    p1 = Post(myPost=post, author=currentUser_obj, timestamp=utcnow,dueDate=dueIn)
+    p1 = Post(myPost=post, author=currentUser_obj, timestamp=utcnow,dueDate=dueIn,startTime=startTime)
     add_post_session.add(p1)
     add_post_session.commit()
     return Response(json.dumps("Ok"))
