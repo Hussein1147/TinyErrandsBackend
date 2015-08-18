@@ -67,10 +67,13 @@ def pretty_date(time=False):
         return str(day_diff / 30) + " months ago"
     return str(day_diff / 365) + " years ago"
     
-def pretty_due(start,interval):
+def pretty_due(interval,start):
     
-    now = datetime.now()
-    f = (Interval) - (now - start)
+    now = datetime.utcnow()
+    
+    p = (interval) - (now - start)
+    f = int(p.total_seconds()/60)
+    
     if f < 60:
         return 'Due in' + f + 'minutes'
    
@@ -277,7 +280,7 @@ def add_post():
     dueIn = unicodedata.normalize('NFKD', data['dueDate']).encode('ascii','ignore')
     start=  unicodedata.normalize('NFKD', data['startTime']).encode('ascii','ignore')
     startTime = datetime.strptime(start,"%Y-%m-%dT%H:%M:%S +0000")
-    utcnow = datetime.now()
+    utcnow = datetime.utcnow()
     add_post_session = s()
     currentUser_obj = get_user_by_email(currentUserEmail,add_post_session)
     p1 = Post(myPost=post, author=currentUser_obj, timestamp=utcnow,dueDate=dueIn,startTime=startTime)
@@ -311,8 +314,10 @@ def get_mypost():
     response = []
     for post in posts:
         post.postedTime =  pretty_date(post.timestamp)
+        post.startDate = pretty_due(post.dueDate,post.startTime)
         del post.__dict__['_sa_instance_state']
         del post.__dict__['timestamp']
+        del post.__dict__['startTime']
         response.append(post.__dict__)
     print response
     return jsonify(success=True, data=response)

@@ -67,15 +67,17 @@ class Post(Base):
     myPost = Column(String(140))
     timestamp = Column(DateTime)
     startTime =Column(DateTime)
+    postedDate = Column(String(40))
     dueDate = Column(Integer)
     user_id = Column(Integer,ForeignKey('user.id'))
     like_count = Column(Integer, default = 0)
-    def __init__(self, myPost,timestamp,author,dueDate,startTime,like_count=None):
+    def __init__(self, myPost,timestamp,author,dueDate,startTime,startDate=None,like_count=None):
         self.myPost=myPost
         self.timestamp=timestamp
         self.author =author
         self.dueDate =dueDate
         self.startTime = startTime
+    
    
    
     
