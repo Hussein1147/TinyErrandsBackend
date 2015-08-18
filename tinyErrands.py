@@ -70,9 +70,9 @@ def pretty_date(time=False):
 def pretty_due(interval,start):
     
     now = datetime.utcnow()
-    
-    p = (interval) - (now - start)
-    f = int(p.total_seconds()/60)
+    t = now - start
+    q = int(t.total_seconds()/60)
+    f = (interval) - q
     
     if f < 60:
         return 'Due in' + f + 'minutes'
