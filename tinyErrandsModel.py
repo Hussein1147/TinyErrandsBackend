@@ -67,7 +67,7 @@ class Post(Base):
     myPost = Column(String(140))
     timestamp = Column(DateTime)
     postedTime = Column(String(40))
-    startTime =Column(DateTime(40)
+    startTime =Column(DateTime(40))
     postedDate = Column(String(40))
     dueDate = Column(Integer)
     user_id = Column(Integer,ForeignKey('user.id'))
