@@ -75,7 +75,7 @@ def pretty_due(interval,start):
     f = (interval) - q
     
     if f < 60:
-        return 'Due in' + f + 'minutes'
+        return 'Due in' + str(f) + 'minutes'
    
     elif f == 60:
         return 'Due in 1 hour'
@@ -84,7 +84,7 @@ def pretty_due(interval,start):
         time = f/float(60)
         hours = int(time)
         minutes = int(60 * (time - int(time)))
-        return 'Due in ' + hours + ' hours and ' + minutes + ' minutes'
+        return 'Due in ' + str(hours) + ' hours and ' + str(minutes) + ' minutes'
     
     elif f == 1440:
         return 'Due in 1 day'
@@ -93,7 +93,7 @@ def pretty_due(interval,start):
         time = f/1440
         days = int(time)
         hours = int(24 * (time - int(time)))
-        return 'Due in ' + days + ' days and ' + hours + ' hours'
+        return 'Due in ' + str(days) + ' days and ' + str(hours) + ' hours'
     
     elif f == 1080:
         return 'Due in 1 week'
@@ -102,7 +102,7 @@ def pretty_due(interval,start):
         time = f/1080
         weeks = int(time)
         days = int (7 * (time - int(time)))
-        return 'Due in '+ weeks + ' weeks and' + days + ' days'
+        return 'Due in '+ str(weeks) + ' weeks and' + str(days) + ' days'
     
     elif f == 40320:
         return 'Due in 1 month'
@@ -111,7 +111,7 @@ def pretty_due(interval,start):
         time = f/40320
         months = int(time)
         weeks = int(4 * (time - int(time)))
-        return 'Due in ' + months + ' months and' + weeks + ' weeks'
+        return 'Due in ' + str(months) + ' months and ' + str(weeks) + ' weeks'
     
     elif f == 483840:
         return 'Due in 1 year'
@@ -120,7 +120,7 @@ def pretty_due(interval,start):
         time = f/483820
         years = int(time)
         months = int(12 * (time - int(time)))
-        return 'Due in ' + years + ' years and' + months + ' months'
+        return 'Due in ' + str(years) + ' years and' + str(months) + ' months'
 
     
 def validate_user(pwdhash,password):
