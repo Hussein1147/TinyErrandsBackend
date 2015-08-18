@@ -102,7 +102,7 @@ def pretty_due(interval,start):
         time = f/1080
         weeks = int(time)
         days = int (7 * (time - int(time)))
-        return 'Due in '+ str(weeks) + ' weeks and' + str(days) + ' days'
+        return 'Due in '+ str(weeks) + ' weeks and ' + str(days) + ' days'
     
     elif f == 40320:
         return 'Due in 1 month'
@@ -120,7 +120,7 @@ def pretty_due(interval,start):
         time = f/483820
         years = int(time)
         months = int(12 * (time - int(time)))
-        return 'Due in ' + str(years) + ' years and' + str(months) + ' months'
+        return 'Due in ' + str(years) + ' years and ' + str(months) + ' months'
 
     
 def validate_user(pwdhash,password):
@@ -314,10 +314,13 @@ def get_mypost():
     response = []
     for post in posts:
         post.postedTime =  pretty_date(post.timestamp)
-        post.startDate = pretty_due(post.dueDate,post.startTime)
+        post.postedDate = pretty_due(post.dueDate,post.startTime)
         del post.__dict__['_sa_instance_state']
         del post.__dict__['timestamp']
         del post.__dict__['startTime']
+        del post.__dict__['dueDate']
+
+        
         response.append(post.__dict__)
     print response
     return jsonify(success=True, data=response)
