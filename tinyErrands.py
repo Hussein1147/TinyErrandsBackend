@@ -31,7 +31,7 @@ def pretty_date(time=False):
     'just now', etc
     """
     from datetime import datetime
-    now = datetime.now()
+    now = datetime.utcnow()
     if type(time) is int:
         diff = now - datetime.fromtimestamp(time)
     elif isinstance(time,datetime):
