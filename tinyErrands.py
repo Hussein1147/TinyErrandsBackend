@@ -277,13 +277,42 @@ def add_post():
     data = request.get_json(force=True)
     currentUserEmail = unicodedata.normalize('NFKD', data['currentUserEmail']).encode('ascii','ignore')
     post = unicodedata.normalize('NFKD', data['myPost']).encode('ascii','ignore')
+    numberOfTask =  unicodedata.normalize('NFKD', data['numberOfTask']).encode('ascii','ignore')
+    
     dueIn = unicodedata.normalize('NFKD', data['dueDate']).encode('ascii','ignore')
     start=  unicodedata.normalize('NFKD', data['startTime']).encode('ascii','ignore')
     startTime = datetime.strptime(start,"%Y-%m-%dT%H:%M:%S +0000")
     utcnow = datetime.utcnow()
     add_post_session = s()
     currentUser_obj = get_user_by_email(currentUserEmail,add_post_session)
-    p1 = Post(myPost=post, author=currentUser_obj, timestamp=utcnow,dueDate=dueIn,startTime=startTime)
+    
+    if numberOfTask == 1:
+        firstTask = unicodedata.normalize('NFKD', data['firstTask']).encode('ascii','ignore')
+        p1 = Post(myPost=post, author=currentUser_obj, timestamp=utcnow,dueDate=dueIn,startTime=startTime, task = {'firstTask':firstTask})
+    elif numberOfTask == 2:
+        firstTask = unicodedata.normalize('NFKD', data['firstTask']).encode('ascii','ignore')
+        secondTask = unicodedata.normalize('NFKD', data['secondTask']).encode('ascii','ignore')
+        p1 = Post(myPost=post, author=currentUser_obj, timestamp=utcnow,
+        dueDate=dueIn,startTime=startTime, task = {'firstTask':firstTask ,'secondTask':secondTask})
+
+        
+    elif numberOfTask == 3:
+        firstTask = unicodedata.normalize('NFKD', data['firstTask']).encode('ascii','ignore')
+        secondTask = unicodedata.normalize('NFKD', data['secondTask']).encode('ascii','ignore')
+        thirdTask =  unicodedata.normalize('NFKD', data['thirdTask']).encode('ascii','ignore')
+        p1 = Post(myPost=post, author=currentUser_obj, timestamp=utcnow,
+        dueDate=dueIn,startTime=startTime, task = {'firstTask':firstTask ,'secondTask':secondTask, 'thirdTask':thirdTask})
+    elif numberOfTask == 4:
+        firstTask = unicodedata.normalize('NFKD', data['firstTask']).encode('ascii','ignore')
+        secondTask = unicodedata.normalize('NFKD', data['secondTask']).encode('ascii','ignore')
+        thirdTask =  unicodedata.normalize('NFKD', data['thirdTask']).encode('ascii','ignore')
+        fourthTask =  unicodedata.normalize('NFKD', data['fourthTask']).encode('ascii','ignore')
+        p1 = Post(myPost=post, author=currentUser_obj, timestamp=utcnow,
+        dueDate=dueIn,startTime=startTime, task = {'firstTask':firstTask ,'secondTask':secondTask, 'thirdTask':thirdTask,'fourthTask':fourthTask})
+    
+    else:
+      p1 = Post(myPost=post, author=currentUser_obj, timestamp=utcnow,dueDate=dueIn,startTime=startTime)
+   
     add_post_session.add(p1)
     add_post_session.commit()
     return Response(json.dumps("Ok"))

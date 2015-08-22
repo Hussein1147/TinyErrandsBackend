@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column,ForeignKey,Integer,BigInteger,String,DateTime,Table
+from sqlalchemy import Column,ForeignKey,Integer,BigInteger,String,DateTime,Table,PickleType
 from sqlalchemy.orm import relationship,sessionmaker,mapper,backref
 from sqlalchemy.sql import update, insert
 from sqlalchemy import create_engine,orm
@@ -69,10 +69,11 @@ class Post(Base):
     postedTime = Column(String(40))
     startTime =Column(DateTime(40))
     postedDate = Column(String(40))
+    task = Column(PickleType)
     dueDate = Column(Integer)
     user_id = Column(Integer,ForeignKey('user.id'))
     like_count = Column(Integer, default = 0)
-    def __init__(self, myPost,timestamp,author,dueDate,startTime,postedDate=None,postedTime=None,like_count=None):
+    def __init__(self, myPost,timestamp,author,dueDate,startTime,postedDate=None,postedTime=None,like_count=None,task= None):
         self.myPost=myPost
         self.timestamp=timestamp
         self.author =author
