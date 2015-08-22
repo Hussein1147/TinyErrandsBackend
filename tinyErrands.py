@@ -288,6 +288,7 @@ def add_post():
     
     if numberOfTask == 1:
         firstTask = unicodedata.normalize('NFKD', data['firstTask']).encode('ascii','ignore')
+        print firstTask
         p1 = Post(myPost=post, author=currentUser_obj, timestamp=utcnow,dueDate=dueIn,startTime=startTime, task = {'firstTask':firstTask})
     elif numberOfTask == 2:
         firstTask = unicodedata.normalize('NFKD', data['firstTask']).encode('ascii','ignore')
