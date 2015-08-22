@@ -284,6 +284,7 @@ def add_post():
     utcnow = datetime.utcnow()
     add_post_session = s()
     currentUser_obj = get_user_by_email(currentUserEmail,add_post_session)
+    print numberOfTask
     
     if numberOfTask == 1:
         firstTask = unicodedata.normalize('NFKD', data['firstTask']).encode('ascii','ignore')
