@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship,sessionmaker,mapper,backref
 from sqlalchemy.sql import update, insert
 from sqlalchemy import create_engine,orm
 from werkzeug import generate_password_hash, check_password_hash
-import warnings
+import warnings,json
 
 
 Base = declarative_base()
@@ -69,7 +69,7 @@ class Post(Base):
     postedTime = Column(String(40))
     startTime =Column(DateTime(40))
     postedDate = Column(String(40))
-    task = Column(PickleType)
+    task = Column(PickleType(protocol=2,pickler=json))
     dueDate = Column(Integer)
     user_id = Column(Integer,ForeignKey('user.id'))
     like_count = Column(Integer, default = 0)

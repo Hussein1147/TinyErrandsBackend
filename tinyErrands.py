@@ -290,7 +290,7 @@ def add_post():
         firstTask = unicodedata.normalize('NFKD', data['firstTask']).encode('ascii','ignore')
         print firstTask
         print numberOfTask
-        p1 = Post(myPost=post, author=currentUser_obj, timestamp=utcnow,dueDate=dueIn,startTime=startTime, task = {'firstTask':firstTask})
+        p1 = Post(myPost=post, author=currentUser_obj, timestamp=utcnow,dueDate=dueIn,startTime=startTime,task = {'firstTask':firstTask})
     elif numberOfTask == str(2):
         firstTask = unicodedata.normalize('NFKD', data['firstTask']).encode('ascii','ignore')
         secondTask = unicodedata.normalize('NFKD', data['secondTask']).encode('ascii','ignore')
@@ -300,7 +300,6 @@ def add_post():
         p1 = Post(myPost=post, author=currentUser_obj, timestamp=utcnow,
         dueDate=dueIn,startTime=startTime, task = {'firstTask':firstTask ,'secondTask':secondTask})
 
-        
     elif numberOfTask == str(3):
         firstTask = unicodedata.normalize('NFKD', data['firstTask']).encode('ascii','ignore')
         secondTask = unicodedata.normalize('NFKD', data['secondTask']).encode('ascii','ignore')
@@ -356,7 +355,6 @@ def get_mypost():
 
         
         response.append(post.__dict__)
-    print response
     return jsonify(success=True, data=response)
     
     
