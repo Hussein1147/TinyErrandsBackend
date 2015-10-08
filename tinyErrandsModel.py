@@ -69,16 +69,17 @@ class Post(Base):
     postedTime = Column(String(40))
     startTime =Column(DateTime(40))
     postedDate = Column(String(40))
-    task = Column(types.PickleType(protocol=2,pickler=json))
+    task = Column(types.PickleType(protocol=2,pickler=json,comparator=None))
     dueDate = Column(Integer)
     user_id = Column(Integer,ForeignKey('user.id'))
     like_count = Column(Integer, default = 0)
-    def __init__(self, myPost,timestamp,author,dueDate,startTime,postedDate=None,postedTime=None,like_count=None,task= None):
+    def __init__(self, myPost,timestamp,author,task,dueDate,startTime,postedDate=None,postedTime=None,like_count=None):
         self.myPost=myPost
         self.timestamp=timestamp
         self.author =author
         self.dueDate =dueDate
         self.startTime = startTime
+        # self.task =task
     
    
    
@@ -115,7 +116,7 @@ class UserPostLike(Base):
 #
 #
 #
-engine = create_engine('mysql://admingDa8K2f:Xq4CV8_Br5jU@127.6.142.132:3306/tinyerrands')
+engine = create_engine('mysql://admingDa8K2f:Xq4CV8_Br5jU@127.0.0.1:3306/tinyerrands')
 s = sessionmaker()
 s.configure(bind=engine)
 Base.metadata.create_all(engine)

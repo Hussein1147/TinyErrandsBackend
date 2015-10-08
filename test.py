@@ -77,13 +77,14 @@ class TestCase(unittest.TestCase):
          self.s.add(u3)
          self.s.add(u4)
          utcnow = datetime.utcnow()
-         p1 = Post(body="post from djibril", author=u1, timestamp=utcnow + timedelta(seconds=1))
-         p2 = Post(body="post from ladji", author=u2, timestamp=utcnow + timedelta(seconds=2))
-         p3 = Post(body="post from hussein", author=u3, timestamp=utcnow + timedelta(seconds=3))
-         p4 = Post(body="post from rohit", author=u4, timestamp=utcnow + timedelta(seconds=4))
+         p1 = Post(myPost="post from djibril", author=u1,dueDate='131',startTime='2015-08-22T05:05:25 +0000',timestamp=utcnow + timedelta(seconds=1), task ={'first':'my poat'})
+         p2 = Post(myPost="post from ladji", author=u2,dueDate='131',startTime='2015-08-22T05:05:25 +0000', timestamp=utcnow + timedelta(seconds=2), task ={'first':'my poat'})
+         p3 = Post(myPost="post from hussein", author=u3,dueDate='131',startTime='2015-08-22T05:05:25 +0000', timestamp=utcnow + timedelta(seconds=3), task ={'first':'my poat'})
+         p4 = Post(myPost="post from rohit", author=u4, dueDate='131',startTime='2015-08-22T05:05:25 +0000',timestamp=utcnow + timedelta(seconds=4), task ={'first':'my poat'})
+         
          self.s.add(p1)
          self.s.add(p2)
-         self.s.add(p3)
+         self.s.add(p3),
          self.s.add(p4)
          self.s.commit()
          
@@ -101,10 +102,13 @@ class TestCase(unittest.TestCase):
          self.s.add(u3)
          self.s.add(u4)
          self.s.commit()
-         f1 = u1.followed_posts(self.s).all()
-         f2 = u2.followed_posts(self.s).all()
-         f3 = u3.followed_posts(self.s).all()
-         f4 = u4.followed_posts(self.s).all()
+         f1 = u1.followed_posts(self.s)
+         print f1
+         f2 = u2.followed_posts(self.s)
+         f3 = u3.followed_posts(self.s)
+         f4 = u4.followed_posts(self.s)
+         print p1.task
+         assert len(p1.task) != 0
          assert len(f2) == 2
          assert len(f3) == 2
          assert len(f4) == 1
